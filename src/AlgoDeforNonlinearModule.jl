@@ -15,7 +15,7 @@ import FinEtools.FieldModule: AbstractField, ndofs, setebc!, numberdofs!, applye
 import FinEtools.NodalFieldModule: NodalField, nnodes
 import FinEtools.FEMMBaseModule: associategeometry!, distribloads, fieldfromintegpoints, elemfieldfromintegpoints
 import ..FEMMDeforNonlinearBaseModule: stiffness, geostiffness, nzebcloads, restoringforce
-import FinEtools.DeforModelRedModule: stresscomponentmap
+import FinEtoolsDeforLinear.DeforModelRedModule: stresscomponentmap
 import FinEtools.ForceIntensityModule: ForceIntensity
 import FinEtools.MeshModificationModule: meshboundary
 import FinEtools.MeshExportModule: vtkexportmesh

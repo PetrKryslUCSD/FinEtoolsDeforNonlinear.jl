@@ -14,11 +14,11 @@ import FinEtools.FieldModule: ndofs, gatherdofnums!, gatherfixedvalues_asvec!, g
 import FinEtools.NodalFieldModule: NodalField, nnodes
 import FinEtools.AssemblyModule: AbstractSysvecAssembler, AbstractSysmatAssembler, SysmatAssemblerSparseSymm, startassembly!, assemble!, makematrix!, makevector!, SysvecAssembler
 import FinEtools.CSysModule: CSys, updatecsmat!
-import FinEtools.DeforModelRedModule: nstressstrain, nthermstrain, Blmat!, divmat, vgradmat
 import FinEtools.MatrixUtilityModule: add_btdb_ut_only!, complete_lt!, add_btv!, locjac!, add_nnt_ut_only!, add_gkgt_ut_only!
-import FinEtools.MatDeforModule: rotstressvec!, stress6vto3x3t!
 import FinEtools.MatModule: massdensity
-import FinEtools.FEMMDeforLinearBaseModule: AbstractFEMMDeforLinear
+import FinEtoolsDeforLinear.DeforModelRedModule: nstressstrain, nthermstrain, Blmat!, divmat, vgradmat
+import FinEtoolsDeforLinear.MatDeforModule: rotstressvec!, stress6vto3x3t!
+import FinEtoolsDeforLinear.FEMMDeforLinearBaseModule: AbstractFEMMDeforLinear
 import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, tangentmoduli!, update!
 import FinEtools.SurfaceNormalModule: SurfaceNormal, updatenormal!
 import LinearAlgebra: Transpose, mul!
