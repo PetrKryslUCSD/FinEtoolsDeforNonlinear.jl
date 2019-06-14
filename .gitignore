@@ -1,0 +1,10 @@
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+*.vtk
+*.jls
+*.jld
+*.csv
+*.CSV
+*.sublime-workspace
+docs/build/
