@@ -1,5 +1,7 @@
-module mneohook1
+module tension_compression_examples
+
 using FinEtools
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
@@ -10,8 +12,8 @@ using SparseArrays
 using DelimitedFiles
 using Interpolations
 using UnicodePlots
-using Test
-function test()
+
+function neohookean_h8()
     mr = DeforModelRed3D
     E, nu = 7.0*phun("MPa"), 0.3
     m = MatDeforNeohookean(mr, E, nu)
@@ -68,7 +70,13 @@ function test()
 
     pl = lineplot(Ux, Rx)
     display(pl)
-end
-end
-using .mneohook1
-mneohook1.test()
+end # function neohookean_h8
+
+function allrun()
+    println("#####################################################")
+    println("# neohookean_h8 ")
+    neohookean_h8()
+    return true
+end # function allrun
+
+end # module tension_compression_examples

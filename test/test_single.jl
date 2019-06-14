@@ -1,9 +1,9 @@
 module m1testsingle4
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: stiffness
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness
 using LinearAlgebra: norm, cross
 using SparseArrays
 using DelimitedFiles
