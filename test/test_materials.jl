@@ -3,15 +3,16 @@ Test of the neohookean material model
 """
 module m1test1
 using FinEtools
-using Hyperelasticity
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
 using LinearAlgebra: norm
 using Test
 function test()
     mr = DeforModelRed3D
     E, nu = 7.0*phun("MPa"), 0.3
-    m = Hyperelasticity.MatDeforNeohookeanModule.MatDeforNeohookean(mr, E, nu)
+    m = FinEtoolsDeforNonlinear.MatDeforNeohookeanModule.MatDeforNeohookean(mr, E, nu)
     # @show m
-    update! = Hyperelasticity.MatDeforNonlinearModule.update!
+    update! = FinEtoolsDeforNonlinear.MatDeforNonlinearModule.update!
 
     stress = fill(0.0, 6)
     output = FFlt[]

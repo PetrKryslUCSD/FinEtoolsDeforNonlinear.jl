@@ -3,10 +3,11 @@ Test of the nonlinear FEM machine
 """
 module m1testop1
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: stiffness
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness
 using LinearAlgebra: norm
 using SparseArrays
 using DelimitedFiles
@@ -38,10 +39,11 @@ m1testop1.test()
 
 module m1testop2
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: stiffness
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness
 using LinearAlgebra: norm
 using SparseArrays
 using DelimitedFiles
@@ -73,10 +75,11 @@ m1testop2.test()
 
 module m1testop3
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: stiffness
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness
 using LinearAlgebra: norm
 using SparseArrays
 using DelimitedFiles
@@ -112,10 +115,11 @@ m1testop3.test()
 
 module m1testop4
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: stiffness
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness
 using LinearAlgebra: norm, cross
 using SparseArrays
 using DelimitedFiles
@@ -155,10 +159,11 @@ m1testop4.test()
 
 module m1testop5
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: stiffness
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness
 using LinearAlgebra: norm
 using SparseArrays
 using DelimitedFiles
@@ -195,10 +200,11 @@ m1testop5.test()
 
 module m1testop6
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: stiffness
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness
 using LinearAlgebra: norm, cross
 using SparseArrays
 using DelimitedFiles
@@ -242,10 +248,11 @@ m1testop6.test()
 
 module m1testop7
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: stiffness
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness
 using LinearAlgebra: norm, cross
 using SparseArrays
 using DelimitedFiles
@@ -286,10 +293,11 @@ m1testop7.test()
 
 module m1testop7a
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: restoringforce
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: restoringforce
 using LinearAlgebra: norm, cross
 using SparseArrays
 using DelimitedFiles
@@ -329,10 +337,11 @@ m1testop7a.test()
 
 module m1testop8
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: restoringforce
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: restoringforce
 using LinearAlgebra: norm, cross
 using SparseArrays
 using DelimitedFiles
@@ -375,10 +384,11 @@ m1testop8.test()
 
 module m1testop9
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: restoringforce
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: restoringforce
 using LinearAlgebra: norm, cross
 using SparseArrays
 using DelimitedFiles
@@ -414,10 +424,11 @@ m1testop9.test()
 
 module m1testop10
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: nzebcloads
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: nzebcloads
 using LinearAlgebra: norm
 using SparseArrays
 using DelimitedFiles
@@ -459,10 +470,11 @@ m1testop10.test()
 
 module m1testop11
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: geostiffness
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: geostiffness
 using LinearAlgebra: norm
 using SparseArrays
 using DelimitedFiles
@@ -504,10 +516,11 @@ m1testop11.test()
 
 module m1testop12
 using FinEtools
-using Hyperelasticity
-using Hyperelasticity.MatDeforNeohookeanModule: MatDeforNeohookean
-using Hyperelasticity.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using Hyperelasticity.FEMMDeforNonlinearBaseModule: geostiffness
+using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: geostiffness
 using LinearAlgebra: norm
 using SparseArrays
 using DelimitedFiles
