@@ -1,7 +1,7 @@
-using Documenter, FinEtools, FinEtoolsDeforNonlinear
+using Documenter, FinEtools, FinEtoolsDeforLinear, FinEtoolsDeforNonlinear
 
 makedocs(
-	modules = [FinEtoolsDeforLinear],
+	modules = [FinEtoolsDeforNonlinear],
 	doctest = false, clean = true,
 	format = Documenter.HTML(prettyurls = false),
 	authors = "Petr Krysl",
