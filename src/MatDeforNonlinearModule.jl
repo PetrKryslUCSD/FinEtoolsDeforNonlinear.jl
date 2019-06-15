@@ -39,7 +39,7 @@ function tangentmoduli!(self::M, D::FFltMat, statev::FFltVec, Fn1::FFltMat, Fn::
 end
 
 """
-    update!(self::M,  stress::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing) where {M<:AbstractMatDeforNonlinear}
+    update!(self::M, statev::FFltVec, stress::FFltVec, output::FFltVec,  Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing) where {M<:AbstractMatDeforNonlinear}
 
 Update material state.
 
