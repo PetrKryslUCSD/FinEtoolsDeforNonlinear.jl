@@ -11,7 +11,7 @@ import LinearAlgebra: eigen, eigvals, norm, cholesky, cross, dot, log, diagm, de
 
 
 """
-	MatDeforElastIso{MR<:AbstractDeforModelRed, MTAN<:Function, MUPD<:Function, MTHS<:Function} <: AbstractMatDeforLinearElastic
+	MatDeforNeohookean{MR<:AbstractDeforModelRed, MTAN<:Function, MUPD<:Function} <: AbstractMatDeforNonlinear
 
 Type for triaxial neohookean hyperelastic material.
 

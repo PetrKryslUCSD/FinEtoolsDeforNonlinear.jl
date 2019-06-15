@@ -2,64 +2,40 @@
 
 ## FEM machines
 
-### Linear deformation
-
-#### Model reduction types
-
-```@autodocs
-Modules = [FinEtools, FinEtools.DeforModelRedModule]
-Private = true
-Order = [:function]
-```
-
-#### Base functionality
-
-```@autodocs
-Modules = [FinEtools, FinEtools.FEMMDeforLinearBaseModule, FinEtools.FEMMDeforLinearModule, FinEtools.FEMMDeforWinklerModule, FinEtools.FEMMDeforLinearMSModule, FinEtools.FEMMDeforSurfaceDampingModule, FinEtools.FEMMDeforLinearNICEModule, FinEtools.FEMMDeforLinearESNICEModule]
-Private = true
-Order = [:function]
-```
+### Nonlinear deformation
 
 #### Simple FE models
 
 ```@autodocs
-Modules = [FinEtools, FinEtools.FEMMDeforLinearModule, FinEtools.FEMMDeforWinklerModule,  FinEtools.FEMMDeforSurfaceDampingModule, ]
-Private = true
-Order = [:function]
-```
-
-#### Advanced FE models
-
-```@autodocs
-Modules = [FinEtools, FinEtools.FEMMDeforLinearMSModule, FinEtools.FEMMDeforLinearNICEModule, FinEtools.FEMMDeforLinearESNICEModule]
+Modules = [FinEtools, FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule ]
 Private = true
 Order = [:function]
 ```
 
 ## Algorithms
 
-### Linear deformation
+### Nonlinear deformation
 
 ```@autodocs
-Modules = [FinEtools, FinEtools.AlgoDeforLinearModule]
+Modules = [FinEtools, FinEtoolsDeforNonlinear.AlgoDeforNonlinearModule]
 Private = true
 Order = [:function]
 ```
 
 ## Material models
 
-### Material for deformation, base functionality
+### Material models for nonlinear deformation
 
 ```@autodocs
-Modules = [FinEtools, FinEtools.MatDeforModule]
+Modules = [FinEtools, FinEtoolsDeforNonlinear.MatDeforNonlinearModule, ]
 Private = true
 Order = [:function]
 ```
 
-### Material models for elasticity
+### Material models for neohookean hyperelasticity
 
 ```@autodocs
-Modules = [FinEtools, FinEtools.MatDeforLinearElasticModule, FinEtools.MatDeforElastIsoModule, FinEtools.MatDeforElastOrthoModule,]
+Modules = [FinEtools,  FinEtoolsDeforNonlinear.MatDeforNeohookeanModule,]
 Private = true
 Order = [:function]
 ```
