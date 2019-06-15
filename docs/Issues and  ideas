@@ -2,6 +2,6 @@ Issues and ideas:
 
 
 -- Documenter:
-using FinEtoolsDeforLinear
+using FinEtoolsDeforNonlinear
 using DocumenterTools
-Travis.genkeys(user="PetrKryslUCSD", repo="https://github.com/PetrKryslUCSD/FinEtoolsHeatDiff.jl")
+Travis.genkeys(user="PetrKryslUCSD", repo="https://github.com/PetrKryslUCSD/FinEtoolsDeforNonlinear.jl")
