@@ -16,7 +16,7 @@ import FinEtools.NodalFieldModule: NodalField, nnodes
 import FinEtools.FEMMBaseModule: associategeometry!, distribloads, fieldfromintegpoints, elemfieldfromintegpoints
 import ..FEMMDeforNonlinearBaseModule: stiffness, geostiffness, nzebcloads, restoringforce
 import FinEtoolsDeforLinear.DeforModelRedModule: stresscomponentmap
-import FinEtools.ForceIntensityModule: ForceIntensity
+import FinEtools.ForceIntensityModule: ForceIntensity, settime!
 import FinEtools.MeshModificationModule: meshboundary
 import FinEtools.MeshExportModule: vtkexportmesh
 import LinearAlgebra: eigen, qr, dot, cholesky, sum
@@ -39,25 +39,26 @@ takes it precisely from the preceding step to the next step in one go.
 * `"traction_bcs"` = array of traction boundary condition dictionaries
 * `"temperature_change"` = dictionary of data for temperature change
 
-For each region (connected piece of the domain made of a particular material),
-mandatory, the  region dictionary  contains values for keys:
+For each region (connected piece of the domain made of a particular
+material), mandatory, the  region dictionary  contains values for keys:
 * `"femm"` = finite element model machine (mandatory);
 
 For essential boundary conditions (optional) each dictionary
 would hold
-  + `"displacement"` = fixed (prescribed) displacement (scalar),  or
-            a function with signature
-                function w = f(x)
-            If not given, zero displacement assumed.
+  + `"displacement"` = when this key is not present, the assumption is
+    that the displacement is fixed at zero (0). Otherwise, this needs to
+    be set to a function with signature `f(lambda)`, where `lambda` is the
+    load factor. In other words, whenever this quantity is supplied, it is
+    implied that the displacement depends on the load factor.
   + `"component"` = which component is prescribed  (1, 2, 3)?
-  + `"node_list"` = list of nodes on the boundary to which the condition applies
-            (mandatory)
+  + `"node_list"` = list of nodes on the boundary to which the condition
+    applies (mandatory)
 
 For traction boundary conditions (optional) each dictionary
 would hold
   + `"femm"` = finite element model machine (mandatory);
-  + `"traction_vector"` = traction vector,  either  a constant or  a function
-        Positive  when outgoing.
+  + `"traction_vector"` = traction vector, a force-intensity
+    (`ForceIntensity`) object.
 
 Control parameters
 The following attributes  may be supplied:
@@ -135,9 +136,7 @@ function nonlinearstatics(modeldata::FDataDict)
             displacement = get(ebc, "displacement", nothing);
             u_fixed = zeros(FFlt, length(fenids)); # default is  zero displacement
             if (displacement != nothing) # if it is nonzero,
-                if (typeof(displacement) <: Function) # it could be a function
-                    ebc["load_factor_dependent"] = true
-                end
+                ebc["load_factor_dependent"] = true
             end
             component = get(ebc, "component", 0); # which component?
             setebc!(un1, fenids[:], true, component, u_fixed);
@@ -187,7 +186,7 @@ function nonlinearstatics(modeldata::FDataDict)
                 ebc = essential_bcs[j]
                 if haskey(ebc, "load_factor_dependent")
                     fenids = get(()->error("Must get node list!"), ebc, "node_list");
-                    displacement = get(ebc, "displacement", nothing);
+                    displacement = ebc["displacement"]
                     component = get(ebc, "component", 0); # which component?
                     for k in 1:length(fenids)
                         u_fixed = displacement(lambda);
@@ -208,6 +207,7 @@ function nonlinearstatics(modeldata::FDataDict)
 
         # Initialize the load vector
         F = fill(0.0, un1.nfreedofs);
+        FL = similar(F);
 
         # If any boundary conditions are inhomogeneous, calculate  the force
         # vector due to the displacement increment. Then update the guess of
@@ -259,19 +259,19 @@ function nonlinearstatics(modeldata::FDataDict)
             #     end
             #     clear body_load fi  femm
             # end
-            #
-            # # Process the traction boundary condition
-            # if (isfield(model_data.boundary_conditions, 'traction' ))
-            #     for j=1:length(model_data.boundary_conditions.traction)
-            #         traction =model_data.boundary_conditions.traction{j};
-            #         femm = femm_deformation (struct ('material',[],...
-            #             'fes',traction.fes,...
-            #             'integration_rule',traction.integration_rule));
-            #         fi= force_intensity(struct('magn',traction.traction));
-            #         F = F + distrib_loads(femm, sysvec_assembler, geom, un1, fi, 2);
-            #     end
-            #     clear traction fi  femm
-            # end
+
+            # Process the traction boundary condition
+            traction_bcs = get(modeldata, "traction_bcs", nothing);
+            if (traction_bcs != nothing)
+                for j=1:length(traction_bcs)
+                    tractionbc = traction_bcs[j]
+                    dcheck!(tractionbc, traction_bcs_recognized_keys)
+                    femm = tractionbc["femm"]
+                    fi = tractionbc["traction_vector"];
+                    settime!(fi, lambda)
+                    F .= F .+ distribloads(femm, geom, un1, fi, 2);
+                end
+            end
 
             # # Process the nodal force boundary condition
             # if (isfield(model_data.boundary_conditions, 'nodal_force' ))
@@ -287,7 +287,8 @@ function nonlinearstatics(modeldata::FDataDict)
             # end
 
             #  External loads vector
-            FL = lambda * F;
+            @show F
+            copyto!(FL, F);
 
             # The restoring  force vector
             FR = fill(0.0, un1.nfreedofs);
@@ -388,7 +389,6 @@ function nonlinearstatics(modeldata::FDataDict)
             femm = deepcopy(regions[i]["femm"])
             FR .-= restoringforce(femm, geom, un1Allfree, unAllfree, lambda, dlambda);
         end
-        @show FR
         reactions = deepcopy(un1Allfree);
         scattersysvec!(reactions, FR);
         setindex!(modeldata, reactions, "reactions");
@@ -411,7 +411,7 @@ function nonlinearstatics(modeldata::FDataDict)
     end # Load-incrementation loop
 
 # TO do: package up the data to be returned in the data model
-@info "to do"
+@info "to do: package up the data to be returned in the data model, describe load factor"
 end
 
 end

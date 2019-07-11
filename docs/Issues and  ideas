@@ -5,3 +5,5 @@ Issues and ideas:
 using FinEtoolsDeforNonlinear
 using DocumenterTools
 Travis.genkeys(user="PetrKryslUCSD", repo="https://github.com/PetrKryslUCSD/FinEtoolsDeforNonlinear.jl")
+
+-- Make all "traction_bcs" referred to force intensity objects.

@@ -1,7 +1,8 @@
-module tension_compression_examples
+module cantilever_examples
 
 using FinEtools
 using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforLinear: FEMMDeforLinear
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
@@ -20,27 +21,32 @@ function neohookean_h8()
     L= 6/2*phun("mm");
     H = 2/2*phun("mm");
     W = 2/2*phun("mm");
-    umag = 1.5*phun("mm");# Magnitude of the displacement
-    nincr = 48
+    tmag = 2*phun("MPa");# Magnitude of the traction
+    nincr = 8
     utol = 10e-7;
     graphics = ~true;
     maxdu_tol = W/1e7;
-    maxiter = 5
+    maxiter = 9
     tolerance = W / 1000
+    traction_vector = [0.0, 0.0, -tmag]
 
     fens, fes = H8block(L, W, H, 2, 1, 1)
 
     l1  = selectnode(fens; box = [0,0,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
     e1 = FDataDict("node_list"=>l1, "component"=>1)
-    l2  = selectnode(fens; box = [-Inf,Inf,0,0,-Inf,Inf], inflate  =  tolerance)
-    e2 = FDataDict("node_list"=>l2, "component"=>2)
-    l3  = selectnode(fens; box = [-Inf,Inf,-Inf,Inf,0,0], inflate  =  tolerance)
-    e3 = FDataDict("node_list"=>l3, "component"=>3)
+    e2 = FDataDict("node_list"=>l1, "component"=>2)
+    e3 = FDataDict("node_list"=>l1, "component"=>3)
+
+    bfes = meshboundary(fes)
+    el1 = selectelem(fens, bfes, box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
+    setvector!(v, XYZ::FFltMat, tangents::FFltMat, fe_label::FInt; time::FFlt = 0.0) = begin
+        v .= time .* traction_vector
+        return v
+    end
+    fi = ForceIntensity(FFlt, length(traction_vector), setvector!, 0.0);
+    t1 = FDataDict("femm"=>FEMMBase(IntegDomain(subset(bfes, el1), GaussRule(2, 2))), "traction_vector"=>fi)
 
     movel1  = selectnode(fens; box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
-    table = LinearInterpolation([0, 0.25, 0.5, 0.75,1], umag*[0,-1,0,1,0])
-    move(lambda) = table(lambda);
-    e4 = FDataDict("node_list"=>movel1, "component"=>1, "displacement"=>move)
 
     # Rmout = fill(0.0, 3, 3)
     # rv = vec([-0.56 -0.1361 0.35])
@@ -50,7 +56,7 @@ function neohookean_h8()
     femm = FEMMDeforNonlinear(mr, IntegDomain(fes, GaussRule(3, 2)), m)
 
     region1 = FDataDict("femm"=>femm)
-    modeldata =  FDataDict("fens"=> fens, "regions"=>  [region1],  "essential_bcs"=>[e1, e2, e3, e4])
+    modeldata =  FDataDict("fens"=> fens, "regions"=>  [region1], "traction_bcs"=>[t1], "essential_bcs"=>[e1, e2, e3])
 
     modeldata["load_multipliers"] = (1:nincr)./nincr*1.0;
     modeldata["maxdu_tol"] = maxdu_tol;
@@ -59,16 +65,16 @@ function neohookean_h8()
     modeldata["iteration_observer"] = (lambda, iter, du, modeldata) -> begin
         @show lambda, iter, modeldata["maxdu"], modeldata["maxbal"]
     end
-    Ux = FFlt[]; Rx = FFlt[]
+    Ux = FFlt[]; lambdas = FFlt[]
     modeldata["increment_observer"] = (lambda, modeldata) -> begin
-        push!(Ux, mean(modeldata["un1"].values[movel1,1]));
-        push!(Rx, sum(modeldata["reactions"].values[movel1,1]));
+        push!(Ux, mean(modeldata["un1"].values[movel1,3]));
+        push!(lambdas, lambda);
     end
 
     modeldata = nonlinearstatics(modeldata);
-    @show Ux, Rx
+    @show Ux / phun("mm"), lambdas
 
-    pl = lineplot(Ux, Rx)
+    pl = lineplot(Ux / phun("mm"), lambdas)
     display(pl)
 end # function neohookean_h8
 
@@ -79,4 +85,4 @@ function allrun()
     return true
 end # function allrun
 
-end # module tension_compression_examples
+end # module cantilever_examples
