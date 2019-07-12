@@ -287,7 +287,6 @@ function nonlinearstatics(modeldata::FDataDict)
             # end
 
             #  External loads vector
-            @show F
             copyto!(FL, F);
 
             # The restoring  force vector
@@ -368,7 +367,6 @@ function nonlinearstatics(modeldata::FDataDict)
 
         # Update the model data
         setindex!(modeldata, un1, "un1");
-        setindex!(modeldata, un, "un");
         setindex!(modeldata, lambda, "t");
         setindex!(modeldata, dlambda, "dt");
 
@@ -410,8 +408,10 @@ function nonlinearstatics(modeldata::FDataDict)
 
     end # Load-incrementation loop
 
-# TO do: package up the data to be returned in the data model
-@info "to do: package up the data to be returned in the data model, describe load factor"
+    # TO do: package up the data to be returned in the data model
+    @info "to do: package up the data to be returned in the data model, describe load factor"
+
+    return modeldata
 end
 
 end
