@@ -46,13 +46,14 @@ material), mandatory, the  region dictionary  contains values for keys:
 For essential boundary conditions (optional) each dictionary
 would hold
   + `"displacement"` = when this key is not present, the assumption is
-    that the displacement is fixed at zero (0). Otherwise, this needs to
-    be set to a function with signature `f(lambda)`, where `lambda` is the
-    load factor. In other words, whenever this quantity is supplied, it is
-    implied that the displacement depends on the load factor.
+        that the displacement is fixed at zero (0). Otherwise, this needs to
+        be set to a function with signature `f(x, lambda)`, where `x` is the
+        location of the node in the reference configuration, and `lambda` is the
+        load factor. In other words, whenever this quantity is supplied, it is
+        implied that the displacement depends on the load factor.
   + `"component"` = which component is prescribed  (1, 2, 3)?
   + `"node_list"` = list of nodes on the boundary to which the condition
-    applies (mandatory)
+        applies (mandatory)
 
 For traction boundary conditions (optional) each dictionary
 would hold
@@ -135,7 +136,7 @@ function nonlinearstatics(modeldata::FDataDict)
             fenids = get(()->error("Must get node list!"), ebc, "node_list");
             displacement = get(ebc, "displacement", nothing);
             u_fixed = zeros(FFlt, length(fenids)); # default is  zero displacement
-            if (displacement != nothing) # if it is nonzero,
+            if (displacement != nothing) # if it is nonzero, it is dependent on the load factor
                 ebc["load_factor_dependent"] = true
             end
             component = get(ebc, "component", 0); # which component?
@@ -189,9 +190,9 @@ function nonlinearstatics(modeldata::FDataDict)
                     displacement = ebc["displacement"]
                     component = get(ebc, "component", 0); # which component?
                     for k in 1:length(fenids)
-                        u_fixed = displacement(lambda);
-                        setebc!(un1, [fenids[k]], true, component, u_fixed);
-                        aany_nonzero_EBC = aany_nonzero_EBC || (u_fixed != 0.0);
+                        u_fixed = displacement(geom.values[fenids[k],:], lambda);
+                        setebc!(un1, [fenids[k]], true, component, u_fixed[1]);
+                        aany_nonzero_EBC = aany_nonzero_EBC || (u_fixed[1] != 0.0);
                     end
                     applyebc!(un1);
                     numberdofs!(un1)

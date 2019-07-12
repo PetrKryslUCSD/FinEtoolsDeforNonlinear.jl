@@ -39,7 +39,7 @@ function neohookean_h8()
 
     movel1  = selectnode(fens; box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
     table = LinearInterpolation([0, 0.25, 0.5, 0.75,1], umag*[0,-1,0,1,0])
-    move(lambda) = table(lambda);
+    move(x, lambda) = table(lambda);
     e4 = FDataDict("node_list"=>movel1, "component"=>1, "displacement"=>move)
 
     # Rmout = fill(0.0, 3, 3)
