@@ -81,6 +81,11 @@ The following attributes  may be supplied:
       The observer function has a signature
                 `output(lambda, modeldata)`
       where `lambda` is the current load factor. Default is to do nothing.
+      The increment observer can refer to the following key-value pairs in `modeldata`:
+      - "un1": converged displacement in current step
+      - "un": converged displacement in the last step
+      - "t": current value of load factor
+      - "dt": increment of the load factor
 
 # Output
 `modeldata` = the dictionary on input is augmented with the keys
@@ -368,6 +373,7 @@ function nonlinearstatics(modeldata::FDataDict)
 
         # Update the model data
         setindex!(modeldata, un1, "un1");
+        setindex!(modeldata, un, "un");
         setindex!(modeldata, lambda, "t");
         setindex!(modeldata, dlambda, "dt");
 
@@ -409,8 +415,9 @@ function nonlinearstatics(modeldata::FDataDict)
 
     end # Load-incrementation loop
 
-    # TO do: package up the data to be returned in the data model
-    @info "to do: package up the data to be returned in the data model, describe load factor"
+    # Return some computed quantities: we stored most of them inside the
+    # incrementation loop, now we add a reference to the final displacement
+    setindex!(modeldata, modeldata["un1"], "u");
 
     return modeldata
 end
