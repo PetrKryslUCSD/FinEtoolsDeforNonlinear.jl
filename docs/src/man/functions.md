@@ -39,3 +39,11 @@ Modules = [FinEtools,  FinEtoolsDeforNonlinear.MatDeforNeohookeanModule,]
 Private = true
 Order = [:function]
 ```
+
+### Material models for St Venant-Kirchhoff hyperelasticity
+
+```@autodocs
+Modules = [FinEtools,  FinEtoolsDeforNonlinear.MatDeforStVKModule,]
+Private = true
+Order = [:function]
+```
