@@ -8,7 +8,14 @@ module FinEtoolsDeforNonlinear
 
 __precompile__(true)
 
-include("allmodules.jl")
+include("MatDeforNonlinearModule.jl")
+include("MatDeforNeohookeanModule.jl")
+include("MatDeforStVKModule.jl")
+
+include("FEMMDeforNonlinearBaseModule.jl")
+include("FEMMDeforNonlinearModule.jl")
+
+include("AlgoDeforNonlinearModule.jl")
 
 # Exports follow:
 

@@ -56,27 +56,27 @@ function MatDeforNeohookean(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FF
 		copyto!(D, (self._lambda / J) * _m1m1 + 2 * (self._mu - self._lambda*log(J))/J * _mI);
 		return D
 	end
-	function update3d!(self::MatDeforNeohookean, statev::FFltVec, stress::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
-		@assert length(stress) == nstressstrain(self.mr)
+	function update3d!(self::MatDeforNeohookean, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
+		@assert length(cauchy) == nstressstrain(self.mr)
 		# Finger deformation tensor
 		b = Fn1*Fn1';
 		J = det(Fn1); # Jacobian of the deformation gradient
 		sigma = (self._mu/J) .* (b - _I3) + (self._lambda *log(J)/J) .* _I3;
-		stress3x3tto6v!(stress, sigma)
+		stress3x3tto6v!(cauchy, sigma)
 		if quantity == :nothing
 			#Nothing to be copied to the output array
 		elseif quantity == :cauchy || quantity == :Cauchy
 			(length(output) >= 6) || (output = zeros(6)) # make sure we can store it
-			copyto!(output, stress);
+			copyto!(output, cauchy);
 		elseif quantity == :pressure || quantity == :Pressure
-			output[1]  =  -sum(stress[1:3])/3.
+			output[1]  =  -sum(cauchy[1:3])/3.
 		elseif quantity == :princCauchy || quantity == :princcauchy
 			ep = eigen(sigma);
 			(length(output) >= 3) || (output = zeros(3)) # make sure we can store it
 			copyto!(output,  sort(ep.values, rev=true));
 		elseif quantity==:vonMises || quantity==:vonmises || quantity==:von_mises || quantity==:vm
-			s1=stress[1]; s2=stress[2]; s3=stress[3];
-			s4=stress[4]; s5=stress[5]; s6=stress[6];
+			s1=cauchy[1]; s2=cauchy[2]; s3=cauchy[3];
+			s4=cauchy[4]; s5=cauchy[5]; s6=cauchy[6];
 			(length(output) >= 1) || (output = zeros(1)) # make sure we can store it
 			output[1] = sqrt(1.0/2*((s1-s2)^2+(s1-s3)^2+(s2-s3)^2+6*(s4^2+s5^2+s6^2)))
 		end
