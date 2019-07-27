@@ -38,9 +38,12 @@ end
 ################################################################################
 
 """
-    MatDeforStVK(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FFlt, nu::FFlt)
+    MatDeforStVK(mr::Type{DeforModelRed3D}, mass_density::FFlt, E1::FFlt, E2::FFlt, E3::FFlt, G12::FFlt, G13::FFlt, G23::FFlt, nu12::FFlt, nu13::FFlt, nu23::FFlt)
 
 Create triaxial St Venant-Kirchhoff hyperelastic material.
+
+In general, the material is assumed to be orthotropic. There is a
+specialized constructor for an isotropic version.
 """
 function MatDeforStVK(mr::Type{DeforModelRed3D}, mass_density::FFlt, E1::FFlt, E2::FFlt, E3::FFlt, G12::FFlt, G13::FFlt, G23::FFlt, nu12::FFlt, nu13::FFlt, nu23::FFlt)
 	compliance =[1/E1      -nu12/E1    -nu13/E1  0   0   0;
