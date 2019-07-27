@@ -11,6 +11,7 @@ __precompile__(true)
 include("MatDeforNonlinearModule.jl")
 include("MatDeforNeohookeanModule.jl")
 include("MatDeforStVKModule.jl")
+include("MatDeforStVKADModule.jl")
 
 include("FEMMDeforNonlinearBaseModule.jl")
 include("FEMMDeforNonlinearModule.jl")
