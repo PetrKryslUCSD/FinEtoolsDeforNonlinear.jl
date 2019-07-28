@@ -15,7 +15,7 @@ moment,  statics and hyper elastic materials are included.
 
 ## News
 
-- 06/11/2019: Applications are now separated  out from the `FinEtools` package.
+- 07/28/2019: Implemented automatic differentiation in material models.
 
 [Past news](oldnews.md)
 
