@@ -21,6 +21,12 @@ version = "1.0.0"
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
+[[BenchmarkTools]]
+deps = ["JSON", "Printf", "Statistics", "Test"]
+git-tree-sha1 = "5d1dd8577643ba9014574cd40d9c028cd5e4b85a"
+uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+version = "0.4.2"
+
 [[BinDeps]]
 deps = ["Compat", "Libdl", "SHA", "URIParser"]
 git-tree-sha1 = "12093ca6cdd0ee547c39b1870e0c9c3f154d9ca9"
@@ -101,15 +107,15 @@ version = "0.8.0"
 
 [[FinEtools]]
 deps = ["Arpack", "DelimitedFiles", "LinearAlgebra", "Printf", "Random", "SparseArrays", "Statistics", "StatsBase", "Test", "Unicode"]
-git-tree-sha1 = "e0799e538bf4845ac8d9d12aa0cb188092b89213"
+git-tree-sha1 = "059ec9adb7114c03dc6227828a80c70f4bd71ee2"
 repo-rev = "master"
 repo-url = "https://github.com/PetrKryslUCSD/FinEtools.jl.git"
 uuid = "91bb5406-6c9a-523d-811d-0644c4229550"
-version = "3.0.0"
+version = "3.0.1"
 
 [[FinEtoolsDeforLinear]]
-deps = ["Arpack", "FinEtools", "LinearAlgebra", "PGFPlotsX", "SparseArrays", "Statistics", "StatsBase", "Test"]
-git-tree-sha1 = "1f5c0d6becfaf541f7fda485802937220bbcbf32"
+deps = ["Arpack", "FinEtools", "LinearAlgebra", "Literate", "PGFPlotsX", "SparseArrays", "Statistics", "StatsBase", "Test"]
+git-tree-sha1 = "e3a56f3df69a4b2971255921fb5d2d0b926942d0"
 repo-rev = "master"
 repo-url = "https://github.com/PetrKryslUCSD/FinEtoolsDeforLinear.jl.git"
 uuid = "e9187c00-8bdd-11e9-1e70-7ba8303116a2"
@@ -131,6 +137,12 @@ git-tree-sha1 = "e1bac96b5ef3ea23b50e801b4a988ec21861a47f"
 uuid = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
 version = "0.12.2"
 
+[[JSON]]
+deps = ["Dates", "Mmap", "Parsers", "Unicode"]
+git-tree-sha1 = "b34d7cef7b337321e97d22242c3c2b91f476748e"
+uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+version = "0.21.0"
+
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
 
@@ -140,6 +152,12 @@ uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 [[LinearAlgebra]]
 deps = ["Libdl"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+
+[[Literate]]
+deps = ["Base64", "JSON", "REPL"]
+git-tree-sha1 = "820f7ed36be4b6d861ebcee9229e3e47d5ffec0e"
+uuid = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
+version = "2.0.1"
 
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -191,6 +209,12 @@ deps = ["OrderedCollections"]
 git-tree-sha1 = "1dfd7cd50a8eb06ef693a4c2bbe945943cd000c5"
 uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 version = "0.11.0"
+
+[[Parsers]]
+deps = ["Dates", "Test"]
+git-tree-sha1 = "db2b35dedab3c0e46dc15996d170af07a5ab91c9"
+uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
+version = "0.3.6"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
