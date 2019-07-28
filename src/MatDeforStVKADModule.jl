@@ -34,13 +34,13 @@ struct  MatDeforStVKAD{MR<:AbstractDeforModelRed, MTAN<:Function, MUPD<:Function
 	_D::FFltMat # cache the constant stiffness matrix of the material
 end
 
-function strainenergy(D, Egl)
-	0.5 * Egl' * D * Egl
-end
-
 ################################################################################
 # 3-D solid model
 ################################################################################
+
+function strainenergy(D, Egl)
+	0.5 * Egl' * D * Egl
+end
 
 """
     MatDeforStVKAD(mr::Type{DeforModelRed3D}, mass_density::FFlt, E1::FFlt, E2::FFlt, E3::FFlt, G12::FFlt, G13::FFlt, G23::FFlt, nu12::FFlt, nu13::FFlt, nu23::FFlt)
