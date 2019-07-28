@@ -2,12 +2,12 @@ module MatDeforNeohookeanADModule
 
 using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, FIntMat, FMat, FVec, FDataDict
 import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed3D, DeforModelRed2DStrain, DeforModelRed2DStress, DeforModelRed2DAxisymm, DeforModelRed1D, nstressstrain, nthermstrain
-import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stress6vto3x3t!, stress3vto2x2t!, stress4vto3x3t!, stress4vto3x3t!, stress3x3tto6v!, strain3x3tto6v!, strain6vto3x3t!, strain6vdet
+import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stress6vto3x3t!, stress3vto2x2t!, stress4vto3x3t!, stress4vto3x3t!, stress3x3tto6v!, strain3x3tto6v!, strain6vto3x3t!, strain6vdet, strain6vtr
 import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, totalLagrangean2current!
 using LinearAlgebra: Transpose, Diagonal, mul!
 At_mul_B!(C, A, B) = mul!(C, Transpose(A), B)
 A_mul_B!(C, A, B) = mul!(C, A, B)
-using LinearAlgebra: eigen, eigvals, norm, cholesky, cross, dot, log, diagm, det, tr
+using LinearAlgebra: eigen, eigvals, norm, cholesky, cross, dot, log, diagm, det
 using ForwardDiff: gradient, hessian
 
 """
@@ -42,9 +42,10 @@ function MatDeforNeohookeanAD(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::
 	_m1m1 = _m1*_m1';
 	_I3 = [1.0 0 0; 0 1.0 0; 0 0 1.0]
 	function strainenergy(Cv, MR, lambda, mu)
+		trC = strain6vtr(MR, Cv)
 		J = sqrt(strain6vdet(MR, Cv))
 		lJ = log(J)
-		return mu/2*(mytr3(Cv)-3) - mu*lJ + lambda/2*(lJ)^2;
+		return mu/2*(trC-3) - mu*lJ + lambda/2*(lJ)^2;
 	end
 	function tangentmoduli3d!(self::MatDeforNeohookeanAD, D::FFltMat, statev::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat, label::FInt)
 		C = Fn1'*Fn1;
