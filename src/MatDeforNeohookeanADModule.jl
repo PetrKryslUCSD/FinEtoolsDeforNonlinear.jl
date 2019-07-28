@@ -3,11 +3,11 @@ module MatDeforNeohookeanADModule
 using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, FIntMat, FMat, FVec, FDataDict
 import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed3D, DeforModelRed2DStrain, DeforModelRed2DStress, DeforModelRed2DAxisymm, DeforModelRed1D, nstressstrain, nthermstrain
 import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stress6vto3x3t!, stress3vto2x2t!, stress4vto3x3t!, stress4vto3x3t!, stress3x3tto6v!, strain3x3tto6v!, strain6vto3x3t!
-import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear
-import LinearAlgebra: Transpose, Diagonal, mul!
+import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, totalLagrangean2current!
+using LinearAlgebra: Transpose, Diagonal, mul!
 At_mul_B!(C, A, B) = mul!(C, Transpose(A), B)
 A_mul_B!(C, A, B) = mul!(C, A, B)
-import LinearAlgebra: eigen, eigvals, norm, cholesky, cross, dot, log, diagm, det, tr
+using LinearAlgebra: eigen, eigvals, norm, cholesky, cross, dot, log, diagm, det, tr
 using ForwardDiff: gradient, hessian
 
 """
@@ -32,10 +32,31 @@ end
 ################################################################################
 
 function strainenergy(Cv, lambda, mu)
-	C = fill(zero(eltype(Cv)), 3, 3)
-	strain6vto3x3t!(C, Cv)
-	J = sqrt(det(C))
-	return mu/2*(tr(C)-3) - mu*log(J) + lambda/2*(log(J))^2;
+	J = sqrt(mydet3(Cv))
+	lJ = log(J)
+	return mu/2*(mytr3(Cv)-3) - mu*lJ + lambda/2*(lJ)^2;
+end
+
+mydet(C) = begin
+C[1,1] * C[2,2] * C[3,3] + 
+C[1,2] * C[2,3] * C[3,1] + 
+C[1,3] * C[2,1] * C[3,2] - 
+C[1,3] * C[2,2] * C[3,1] - 
+C[1,2] * C[2,1] * C[3,3] - 
+C[1,1] * C[2,3] * C[3,2]
+end
+
+mydet3(Cv) = begin
+Cv[1] * Cv[2] * Cv[3] + 
+Cv[4]/2 * Cv[6]/2 * Cv[5]/2 + 
+Cv[5]/2 * Cv[4]/2 * Cv[6]/2 -  
+Cv[5]/2 * Cv[2] * Cv[5]/2 - 
+Cv[4]/2 * Cv[4]/2 * Cv[3] - 
+Cv[1] * Cv[6]/2 * Cv[6]/2
+end
+
+mytr3(Cv) = begin
+Cv[1] + Cv[2] + Cv[3]
 end
 
 """
@@ -52,9 +73,8 @@ function MatDeforNeohookeanAD(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::
 		C = Fn1'*Fn1;
 		Cv = fill(0.0, 6)
 		strain3x3tto6v!(Cv, C)
-		@show hessian(Cv -> strainenergy(Cv, self._lambda, self._mu), Cv);
-		D .= hessian(Cv -> strainenergy(Cv, self._lambda, self._mu), Cv);
-		return D
+		Dtotal = 4 .* hessian(Cv -> strainenergy(Cv, self._lambda, self._mu), Cv);
+		return totalLagrangean2current!(D, Dtotal, Fn1)
 	end
 	function update3d!(self::MatDeforNeohookeanAD, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
 		@assert length(cauchy) == nstressstrain(self.mr)
