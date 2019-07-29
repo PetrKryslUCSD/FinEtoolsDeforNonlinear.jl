@@ -96,7 +96,10 @@ Convert a total Lagrangean constitutive matrix to a current Lagrangean one
 (sometimes known as "Eulerian").
 
 - `C`    = Lagrangean constitutive matrix, 6x6, symmetric
-- `F`    = current deformation gradient, F_ij = partial x_i / partial X_j
+- `F`    = current deformation gradient, F_iJ = partial x_i / partial X_J
+
+The transformation is c_ijkl = 1/J C_IJKL F_iI F_jJ F_kK F_lL. In the present
+case the fourth-order tensor is represented with a 6 x 6 matrix.
 
 !!! note
 The Lagrangean material stiffness matrices, both input and output, are
