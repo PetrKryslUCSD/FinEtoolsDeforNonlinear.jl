@@ -56,8 +56,7 @@ function MatDeforStVK(mr::Type{DeforModelRed3D}, mass_density::FFlt, E1::FFlt, E
 	_I3 = [1.0 0 0; 0 1.0 0; 0 0 1.0]
 	function tangentmoduli3d!(self::MatDeforStVK, D::FFltMat, statev::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat, label::FInt)
 		J = det(Fn1);
-		copyto!(D, self._D);
-		return D
+		return totalLagrangean2current!(D, self._D, Fn1)
 	end
 	function update3d!(self::MatDeforStVK, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
 		@assert length(cauchy) == nstressstrain(self.mr)

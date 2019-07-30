@@ -1,6 +1,7 @@
 module testelasticitytensor1
 using FinEtools
 using FinEtoolsDeforNonlinear.MatDeforNonlinearModule: totalLagrangean2current!
+using FinEtoolsDeforLinear.MatDeforModule: tens4symmto6x6t!
 using LinearAlgebra
 using Test
 
@@ -14,7 +15,8 @@ function test()
 		C[I, J, K, L] = lambda * delta(I, J) * delta(K, L) + 
 		mu * (delta(I, K) * delta(J, L) + delta(I, L) * delta(J, K))
 	end
-	Cm = tens4_symm_to_6(C)
+	Cm = fill(0.0, 6, 6)
+	tens4symmto6x6t!(Cm, C)
 	c = fill(0.0, 6, 6)
 	totalLagrangean2current!(c, Cm, F)
 	c2 = fill(0.0, 3, 3, 3, 3)
@@ -24,7 +26,8 @@ function test()
 			c2[i, j, k, l] += C[I, J, K, L] / det(F) * F[i, I] * F[j, J] * F[k, K] * F[l, L]
 		end
 	end
-	c2m = tens4_symm_to_6(c2)
+	c2m = fill(0.0, 6, 6)
+	tens4symmto6x6t!(c2m, c2)
 	@test norm(c - c2m) <= 1.0e-12
 end
 end
