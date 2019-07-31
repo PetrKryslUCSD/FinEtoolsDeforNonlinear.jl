@@ -132,7 +132,7 @@ function neohookeanad_h8()
 
     pl = lineplot((L .+ Ux) ./ L, Rx, canvas = DotCanvas)
     display(pl)
-end # function neohookean_h8
+end # function neohookeanad_h8
 
 function stvk_h8()
     mr = DeforModelRed3D
@@ -191,7 +191,7 @@ function stvk_h8()
 
     pl = lineplot((L .+ Ux) ./ L, Rx, canvas = DotCanvas)
     display(pl)
-end # function neohookean_h8
+end # function stvk_h8
 
 function stvkad_h8()
     mr = DeforModelRed3D
@@ -250,7 +250,7 @@ function stvkad_h8()
 
     pl = lineplot((L .+ Ux) ./ L, Rx, canvas = DotCanvas)
     display(pl)
-end # function neohookean_h8
+end # function stvkad_h8
 
 function allrun()
     println("#####################################################")
