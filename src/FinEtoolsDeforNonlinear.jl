@@ -13,6 +13,7 @@ include("MatDeforNeohookeanModule.jl")
 include("MatDeforNeohookeanADModule.jl")
 include("MatDeforStVKModule.jl")
 include("MatDeforStVKADModule.jl")
+include("MatDeforI1RivlinADModule.jl")
 
 include("FEMMDeforNonlinearBaseModule.jl")
 include("FEMMDeforNonlinearModule.jl")
