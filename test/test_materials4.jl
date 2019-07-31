@@ -67,8 +67,8 @@ function test()
 	modeldata = nonlinearstatics(modeldata);
 	# @show minimum(Ux), minimum(Rx), maximum(Ux), maximum(Rx)
 
-	@test (minimum(Ux), minimum(Rx), maximum(Ux), maximum(Rx)) == 
-	 (-0.0015, -6.547464398217384, 0.0014999999999999994, 2.6479612347602295)    
+	@test [minimum(Ux), minimum(Rx), maximum(Ux), maximum(Rx)] ≈
+	 [-0.0015, -6.547464398217384, 0.0014999999999999994, 2.6479612347602295]    
 	# pl = lineplot((L .+ Ux) ./ L, Rx, canvas = DotCanvas)
 	# display(pl)
 	return true
