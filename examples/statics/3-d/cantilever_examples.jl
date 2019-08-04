@@ -30,7 +30,7 @@ function neohookean_h8()
     tolerance = W / 1000
     traction_vector = [0.0, 0.0, -tmag]
 
-    fens, fes = H8block(L, W, H, 6, 3, 3)
+    fens, fes = H8block(L, W, H, 16, 9, 9)
 
     l1  = selectnode(fens; box = [0,0,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
     e1 = FDataDict("node_list"=>l1, "component"=>1)
