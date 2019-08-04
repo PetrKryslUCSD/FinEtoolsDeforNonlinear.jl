@@ -1,82 +1,67 @@
-
-module tensioncompression4
+module m3test2a
 using FinEtools
 using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtoolsDeforLinear: stress3x3tto6v!
 using FinEtoolsDeforNonlinear
-using FinEtoolsDeforNonlinear.MatDeforI1RivlinADModule: MatDeforI1RivlinAD
-using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using FinEtoolsDeforNonlinear.AlgoDeforNonlinearModule: nonlinearstatics
-using LinearAlgebra: norm
-using Statistics: mean
-using SparseArrays
-using DelimitedFiles
-using Interpolations
-using UnicodePlots
+using LinearAlgebra
 using Test
 function test()
-	mr = DeforModelRed3D
-	E, nu = 7.0*phun("MPa"), 0.3
-	m = MatDeforI1RivlinAD(mr, E, nu)
-	L= 6/2*phun("mm");
-	H = 2/2*phun("mm");
-	W = 2/2*phun("mm");
-	umag = 1.0*phun("mm");# Magnitude of the displacement
-	nincr = 48
-	utol = 10e-7;
-	graphics = ~true;
-	maxdu_tol = W/1e7;
-	maxiter = 5
-	tolerance = W / 1000
+    mr = DeforModelRed3D
+    E, nu = 7.0*phun("MPa"), 0.3
+    c1, c2, K = 0.55, 0.3, 55.0
+    m1 = FinEtoolsDeforNonlinear.MatDeforI1RivlinADModule.MatDeforI1RivlinAD(mr, c1, c2, K)
+    # @show m
+    update! = FinEtoolsDeforNonlinear.MatDeforNonlinearModule.update!
+    tangentmoduli! = FinEtoolsDeforNonlinear.MatDeforNonlinearModule.tangentmoduli!
 
-	fens, fes = H8block(L, W, H, 2, 1, 1)
+    stress = fill(0.0, 6)
+    D = fill(0.0, 6, 6)
+    output = FFlt[]
+    statev = FFlt[]
+    tn = 0.0
+    dtn = 0.0
+    loc = [0.0 0.0 0.0]
+    label = 0
+    quantity=:nothing
 
-	l1  = selectnode(fens; box = [0,0,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
-	e1 = FDataDict("node_list"=>l1, "component"=>1)
-	l2  = selectnode(fens; box = [-Inf,Inf,0,0,-Inf,Inf], inflate  =  tolerance)
-	e2 = FDataDict("node_list"=>l2, "component"=>2)
-	l3  = selectnode(fens; box = [-Inf,Inf,-Inf,Inf,0,0], inflate  =  tolerance)
-	e3 = FDataDict("node_list"=>l3, "component"=>3)
+    Fn1 = [1.1 0 0; 0 1.0 0; 0 0 1.0]
+    Fn = [1.0 0 0; 0 1.0 0; 0 0 1.0]
+    update!(m1, statev, stress, output, Fn1, Fn, tn, dtn, loc, label, quantity)
+    # @show stress
+    J = det(Fn1)
+    b = Fn1 * Fn1'
+    cau = 2/J * (c1 + 2*c2*(tr(b) - 3)) * b + (K*(J - 1) - 2*c1/J) * I
+    cauv = fill( 0.0 , 6)
+    stress3x3tto6v!(cauv, cau)
+    @test norm(cauv - stress) < 1.0e-10
+    
 
-	movel1  = selectnode(fens; box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
-	table = LinearInterpolation([0, 0.25, 0.5, 0.75,1], umag*[0,-1,0,1,0])
-	move(x, lambda) = table(lambda);
-	e4 = FDataDict("node_list"=>movel1, "component"=>1, "displacement"=>move)
-
-	# Rmout = fill(0.0, 3, 3)
-	# rv = vec([-0.56 -0.1361 0.35])
-	# rotmat3!(Rmout, rv)
-	# mcsys = CSys(Rmout)
-	# femm = FEMMDeforNonlinear(mr, IntegDomain(fes, GaussRule(3, 2)), mcsys, m)
-	femm = FEMMDeforNonlinear(mr, IntegDomain(fes, GaussRule(3, 2)), m)
-
-	region1 = FDataDict("femm"=>femm)
-	modeldata =  FDataDict("fens"=> fens, "regions"=>  [region1],  "essential_bcs"=>[e1, e2, e3, e4])
-
-	modeldata["load_multipliers"] = (1:nincr)./nincr*1.0;
-	modeldata["maxdu_tol"] = maxdu_tol;
-	modeldata["maxiter"] = maxiter;
-	modeldata["line_search"]  = true;
-	modeldata["iteration_observer"] = (lambda, iter, du, modeldata) -> begin
-	    # @show lambda, iter, modeldata["maxdu"], modeldata["maxbal"]
-	end
-	Ux = FFlt[]; Rx = FFlt[]
-	modeldata["increment_observer"] = (lambda, modeldata) -> begin
-	    push!(Ux, mean(modeldata["un1"].values[movel1,1]));
-	    push!(Rx, sum(modeldata["reactions"].values[movel1,1]));
-	end
-
-	modeldata = nonlinearstatics(modeldata);
-	# @show minimum(Ux), minimum(Rx), maximum(Ux), maximum(Rx)
-
-	@test [minimum(Ux), minimum(Rx), maximum(Ux), maximum(Rx)] ≈
-	 [-0.001, -1.2962962962962954, 0.0009999999999999996, 3.629629629629627]    
-	# pl = lineplot((L .+ Ux) ./ L, Rx, canvas = DotCanvas)
-	# display(pl)
-	return true
+    Fn1 = [1.1 0 0.07; 0.001 0.97 0; -0.01 0 1.03]
+    Fn = [1.0 0 0; 0 1.0 0; 0 0 1.0]
+    update!(m1, statev, stress, output, Fn1, Fn, tn, dtn, loc, label, quantity)
+    # @show stress
+    J = det(Fn1)
+    b = Fn1 * Fn1'
+    cau = 2/J * (c1 + 2*c2*(tr(b) - 3)) * b + (K*(J - 1) - 2*c1/J) * I
+    cauv = fill( 0.0 , 6)
+    stress3x3tto6v!(cauv, cau)
+    @test norm(cauv - stress) < 1.0e-10
+    
+    Fn1 = [1.1 -0.0333 0.07; 0.001 0.97 0; -0.01 -0.05 1.03]
+    Fn = [1.0 0 0; 0 1.0 0; 0 0 1.0]
+    update!(m1, statev, stress, output, Fn1, Fn, tn, dtn, loc, label, quantity)
+    # @show stress
+    J = det(Fn1)
+    b = Fn1 * Fn1'
+    cau = 2/J * (c1 + 2*c2*(tr(b) - 3)) * b + (K*(J - 1) - 2*c1/J) * I
+    cauv = fill( 0.0 , 6)
+    stress3x3tto6v!(cauv, cau)
+    @test norm(cauv - stress) < 1.0e-10
+    
 end
 end
-using .tensioncompression4
-tensioncompression4.test()
+using .m3test2a
+m3test2a.test()
 
 
 
