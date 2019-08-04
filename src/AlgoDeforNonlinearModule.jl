@@ -234,7 +234,7 @@ function nonlinearstatics(modeldata::FDataDict)
                     K = K + geostiffness(femm, geom, un, unm1, lambda, dlambda);
                 end
             end
-            incrscattersysvec!(un1, Matrix(K)\F);
+            incrscattersysvec!(un1, K\F);
         end
 
         # Iteration loop
@@ -304,7 +304,7 @@ function nonlinearstatics(modeldata::FDataDict)
 
             # Solve the system of linear algebraic equations
             F .= (FL .+ FR);
-            dusol = Matrix(K)\F;
+            dusol = K\F;
 
             #  Distribute the solution
             fill!(du.values, 0.0)
