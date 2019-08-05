@@ -49,10 +49,6 @@ end
 Create triaxial neohookean hyperelastic material.
 """
 function MatDeforNeohookeanAD(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FFlt, nu::FFlt)
-	_mI = diagm(0=>[1, 1, 1, 0.5, 0.5, 0.5]);
-	_m1 = vec(FFlt[1 1 1 0 0 0]) ;
-	_m1m1 = _m1*_m1';
-	_I3 = [1.0 0 0; 0 1.0 0; 0 0 1.0]
 	function strainenergy(Cv, mr, lambda, mu)
 		trC = strainvtr(mr, Cv)
 		J = sqrt(strainvdet(mr, Cv))
@@ -112,48 +108,40 @@ end
 Create triaxial neohookean hyperelastic material.
 """
 function MatDeforNeohookeanAD(mr::Type{DeforModelRed2DStrain}, mass_density::FFlt, E::FFlt, nu::FFlt)
-	_mI = diagm(0=>[1, 1, 1, 0.5, 0.5, 0.5]);
-	_m1 = vec(FFlt[1 1 1 0 0 0]) ;
-	_m1m1 = _m1*_m1';
-	_I3 = [1.0 0 0; 0 1.0 0; 0 0 1.0]
-	function strainenergy(Cv, lambda, mu)
-		trC = strain6vtr(DeforModelRed3D, Cv)
-		J = sqrt(strain6vdet(DeforModelRed3D, Cv))
+	function strainenergy(Cv, mr, lambda, mu)
+		trC = strainvtr(mr, Cv)
+		J = sqrt(strainvdet(mr, Cv))
 		lJ = log(J)
 		return mu/2*(trC-3) - mu*lJ + lambda/2*(lJ)^2;
 	end
 	function tangentmoduli2dstrain!(self::MatDeforNeohookeanAD, D::FFltMat, statev::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat, label::FInt)
-		C2 = Fn1'*Fn1;
-		C = fill(0.0, 3, 3)
-		C[1:2, 1:2] = C2
-		Cv = fill(0.0, 6)
-		strain3x3tto6v!(Cv, C)
-		Dtotal = 4 .* hessian(Cv -> strainenergy(Cv, self._lambda, self._mu), Cv);
-		Dcurrent = fill(0.0, size(Dtotal))
 		Fn13d = fill(0.0, 3, 3)
 		Fn13d[1:2, 1:2] = Fn1
 		Fn13d[3, 3] = 1.0
+		C = Fn13d'*Fn13d;
+		Cv = fill(0.0, 6)
+		strainttov!(mr, Cv, C)
+		Dtotal = 4 .* hessian(Cv -> strainenergy(Cv, mr, self._lambda, self._mu), Cv);
+		Dcurrent = fill(0.0, size(Dtotal))
 		totalLagrangean2current!(Dcurrent, Dtotal, Fn13d)
-		fill!(D,  0.0)
+		fill!(D, 0.0)
 		D[1:2, 1:2] = Dcurrent[1:2, 1:2]
 		D[3, 3] = Dcurrent[4, 4]
 		return D
 	end
 	function update2dstrain!(self::MatDeforNeohookeanAD, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
 		@assert length(cauchy) == nstressstrain(self.mr)
-		C2 = Fn1'*Fn1;
-		C = fill(0.0, 3, 3)
-		C[1:2, 1:2] = C2
-		Cv = fill(0.0, 6)
-		strain3x3tto6v!(Cv, C)
-		Sv = 2 * gradient(Cv -> strainenergy(Cv, self._lambda, self._mu), Cv);
-		S = fill(0.0, 3, 3)
-		stress6vto3x3t!(S, Sv)
 		Fn13d = fill(0.0, 3, 3)
 		Fn13d[1:2, 1:2] = Fn1
 		Fn13d[3, 3] = 1.0
+		C = Fn13d'*Fn13d;
+		Cv = fill(0.0, 6)
+		strainttov!(mr, Cv, C)
+		Sv = 2 * gradient(Cv -> strainenergy(Cv, mr, self._lambda, self._mu), Cv);
+		S = fill(0.0, 3, 3)
+		stressvtot!(mr, S, Sv)
 		cauchyt = Fn13d*(S/det(Fn1))*Fn13d'; # Cauchy stress
-		stress2x2tto3v!(cauchy, cauchyt[1:2, 1:2])
+		stressttov!(mr, cauchy, cauchyt)
 		if quantity == :nothing
 			#Nothing to be copied to the output array
 		elseif quantity == :cauchy || quantity == :Cauchy
