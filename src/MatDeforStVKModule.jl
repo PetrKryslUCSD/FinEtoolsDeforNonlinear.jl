@@ -2,7 +2,7 @@ module MatDeforStVKModule
 
 using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, FIntMat, FMat, FVec, FDataDict
 import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed3D, DeforModelRed2DStrain, DeforModelRed2DStress, DeforModelRed2DAxisymm, DeforModelRed1D, nstressstrain, nthermstrain
-import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stress6vto3x3t!, stress3vto2x2t!, stress4vto3x3t!, stress4vto3x3t!, stress3x3tto6v!, strain3x3tto6v!
+import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stressvtot!, stressttov!, strainttov!
 import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, totalLagrangean2current!
 import LinearAlgebra: Transpose, Diagonal, mul!
 At_mul_B!(C, A, B) = mul!(C, Transpose(A), B)
@@ -65,13 +65,13 @@ function MatDeforStVK(mr::Type{DeforModelRed3D}, mass_density::FFlt, E1::FFlt, E
 		# Green-Lagrange strain
 		E = 1/2*(C-_I3)
 		Egl = fill(0.0, nstressstrain(self.mr))
-		strain3x3tto6v!(Egl, E);
+		strainttov!(mr, Egl, E);
 		S = self._D * Egl;
 		St = fill(0.0, 3, 3)
-		stress6vto3x3t!(St, S)
+		stressvtot!(mr, St, S)
 		J = det(Fn1);
 		cauchyt = Fn1*(St/J)*Fn1'; # Cauchy stress
-		stress3x3tto6v!(cauchy, cauchyt)
+		stressttov!(mr, cauchy, cauchyt)
 		if quantity == :nothing
 			#Nothing to be copied to the output array
 		elseif quantity == :cauchy || quantity == :Cauchy

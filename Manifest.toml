@@ -120,7 +120,7 @@ version = "3.0.1"
 
 [[FinEtoolsDeforLinear]]
 deps = ["Arpack", "BenchmarkTools", "FinEtools", "LinearAlgebra", "Literate", "PGFPlotsX", "SparseArrays", "Statistics", "StatsBase", "Test"]
-git-tree-sha1 = "a591d23c2b16b080c80f2e96a784ce452971ff6a"
+git-tree-sha1 = "282a00a8e73372ab9dcb63a68e65a2c1ac06da8e"
 repo-rev = "master"
 repo-url = "https://github.com/PetrKryslUCSD/FinEtoolsDeforLinear.jl.git"
 uuid = "e9187c00-8bdd-11e9-1e70-7ba8303116a2"

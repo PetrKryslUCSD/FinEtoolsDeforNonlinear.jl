@@ -1,8 +1,9 @@
 using Pkg
 Pkg.activate(".")
-Pkg.instantiate()
+# Pkg.instantiate()
 using FinEtoolsDeforNonlinear
 
-include(".\\examples\\statics\\3-d\\cantilever_examples.jl");
-cantilever_examples.neohookean_h8()
+# include(".\\examples\\statics\\2-d\\tension_compression_examples.jl");
+# tension_compression_examples.neohookeanad_q4()
 
+Pkg.test()

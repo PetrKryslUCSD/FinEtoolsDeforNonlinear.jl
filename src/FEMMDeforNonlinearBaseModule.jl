@@ -17,7 +17,7 @@ import FinEtools.CSysModule: CSys, updatecsmat!
 import FinEtools.MatrixUtilityModule: add_btdb_ut_only!, complete_lt!, add_btv!, locjac!, add_nnt_ut_only!, add_gkgt_ut_only!
 import FinEtools.MatModule: massdensity
 import FinEtoolsDeforLinear.DeforModelRedModule: nstressstrain, nthermstrain, Blmat!, divmat, vgradmat
-import FinEtoolsDeforLinear.MatDeforModule: rotstressvec!, stress6vto3x3t!
+import FinEtoolsDeforLinear.MatDeforModule: rotstressvec!, stressvtot!
 import FinEtoolsDeforLinear.FEMMDeforLinearBaseModule: AbstractFEMMDeforLinear
 import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, tangentmoduli!, update!
 import FinEtools.SurfaceNormalModule: SurfaceNormal, updatenormal!
@@ -363,7 +363,7 @@ function geostiffness(self::AbstractFEMMDeforNonlinear, assembler::A, geom::Noda
             rotF!(Fn1m, Fn1, RmTF, Rm) # wrt local c.s.
             update!(self.material, statev[i][j], cauchy, output, Fn1m, Fnm, tn, dtn, loc, fes.label[i])
             A_mul_B!(gradxmN, (gradXN / Fn1), Rm)
-            stress6vto3x3t!(sigma, cauchy);
+            stressvtot!(self.material.mr, sigma, cauchy);
             fill!(c1, 0.0)
             add_gkgt_ut_only!(c1, gradxmN, Jac*w[j]*det(Fn1), sigma, sg)
             elmat1[idx,idx]   .= c1;

@@ -2,7 +2,7 @@ module MatDeforI1RivlinADModule
 
 using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, FIntMat, FMat, FVec, FDataDict
 import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed3D, DeforModelRed2DStrain, DeforModelRed2DStress, DeforModelRed2DAxisymm, DeforModelRed1D, nstressstrain, nthermstrain
-import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stress6vto3x3t!, stress3vto2x2t!, stress4vto3x3t!, stress4vto3x3t!, stress3x3tto6v!, strain3x3tto6v!, strain6vto3x3t!, strain6vdet, strain6vtr
+import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stressvtot!, stressttov!, strainttov!, strainvdet, strainvtr
 import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, totalLagrangean2current!
 using LinearAlgebra: Transpose, Diagonal, mul!
 At_mul_B!(C, A, B) = mul!(C, Transpose(A), B)
@@ -52,16 +52,16 @@ function MatDeforI1RivlinAD(mr::Type{DeforModelRed3D}, mass_density::FFlt, c1::F
 	_I3 = [1.0 0 0; 0 1.0 0; 0 0 1.0]
 	# neo-hookean:  mu/2*(trC-3) - mu*lJ + lambda/2*(lJ)^2;
 	# two-term I1-based Rivlin:
-	function strainenergy(Cv, MR, c1, c2, K)
-		trC = strain6vtr(MR, Cv)
-		J = sqrt(strain6vdet(MR, Cv))
+	function strainenergy(Cv, mr, c1, c2, K)
+		trC = strainvtr(mr, Cv)
+		J = sqrt(strainvdet(mr, Cv))
 		lJ = log(J)
 		return c1*(trC-3) + c2*(trC-3)^2 - 2*c1*(lJ) + K/2*(J - 1)^2;
 	end
 	function tangentmoduli3d!(self::MatDeforI1RivlinAD, D::FFltMat, statev::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat, label::FInt)
 		C = Fn1'*Fn1;
 		Cv = fill(0.0, 6)
-		strain3x3tto6v!(Cv, C)
+		strainttov!(mr, Cv, C)
 		Dtotal = 4 .* hessian(Cv -> strainenergy(Cv, mr, self.c1, self.c2, self.K), Cv);
 		return totalLagrangean2current!(D, Dtotal, Fn1)
 	end
@@ -69,12 +69,12 @@ function MatDeforI1RivlinAD(mr::Type{DeforModelRed3D}, mass_density::FFlt, c1::F
 		@assert length(cauchy) == nstressstrain(self.mr)
 		C = Fn1'*Fn1;
 		Cv = fill(0.0, 6)
-		strain3x3tto6v!(Cv, C)
+		strainttov!(mr, Cv, C)
 		Sv = 2 * gradient(Cv -> strainenergy(Cv, mr, self.c1, self.c2, self.K), Cv);
 		S = fill(0.0, 3, 3)
-		stress6vto3x3t!(S, Sv)
+		stressvtot!(mr, S, Sv)
 		cauchyt = Fn1*(S/det(Fn1))*Fn1'; # Cauchy stress
-		stress3x3tto6v!(cauchy, cauchyt)
+		stressttov!(mr, cauchy, cauchyt)
 		if quantity == :nothing
 			#Nothing to be copied to the output array
 		elseif quantity == :cauchy || quantity == :Cauchy

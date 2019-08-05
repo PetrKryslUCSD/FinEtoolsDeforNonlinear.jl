@@ -2,7 +2,7 @@ module MatDeforNeohookeanModule
 
 using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, FIntMat, FMat, FVec, FDataDict
 import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed3D, DeforModelRed2DStrain, DeforModelRed2DStress, DeforModelRed2DAxisymm, DeforModelRed1D, nstressstrain, nthermstrain
-import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stress6vto3x3t!, stress3vto2x2t!, stress4vto3x3t!, stress4vto3x3t!, stress3x3tto6v!
+import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stressvtot!, stressttov!
 import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear
 import LinearAlgebra: Transpose, Diagonal, mul!
 At_mul_B!(C, A, B) = mul!(C, Transpose(A), B)
@@ -62,7 +62,7 @@ function MatDeforNeohookean(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FF
 		b = Fn1*Fn1';
 		J = det(Fn1); # Jacobian of the deformation gradient
 		sigma = (self._mu/J) .* (b - _I3) + (self._lambda *log(J)/J) .* _I3;
-		stress3x3tto6v!(cauchy, sigma)
+		stressttov!(mr, cauchy, sigma)
 		if quantity == :nothing
 			#Nothing to be copied to the output array
 		elseif quantity == :cauchy || quantity == :Cauchy

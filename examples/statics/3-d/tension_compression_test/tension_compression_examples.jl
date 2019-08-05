@@ -46,11 +46,6 @@ function neohookean_h8()
     move(x, lambda) = table(lambda);
     e4 = FDataDict("node_list"=>movel1, "component"=>1, "displacement"=>move)
 
-    # Rmout = fill(0.0, 3, 3)
-    # rv = vec([-0.56 -0.1361 0.35])
-    # rotmat3!(Rmout, rv)
-    # mcsys = CSys(Rmout)
-    # femm = FEMMDeforNonlinear(mr, IntegDomain(fes, GaussRule(3, 2)), mcsys, m)
     femm = FEMMDeforNonlinear(mr, IntegDomain(fes, GaussRule(3, 2)), m)
 
     region1 = FDataDict("femm"=>femm)

@@ -97,7 +97,7 @@ testelasticitytensor1.test()
 module m3test2a
 using FinEtools
 using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
-using FinEtoolsDeforLinear: stress3x3tto6v!
+using FinEtoolsDeforLinear: stressttov!
 using FinEtoolsDeforNonlinear
 using LinearAlgebra
 using Test
@@ -128,7 +128,7 @@ function test()
     b = Fn1 * Fn1'
     cau = 2/J * (c1 + 2*c2*(tr(b) - 3)) * b + (K*(J - 1) - 2*c1/J) * I
     cauv = fill( 0.0 , 6)
-    stress3x3tto6v!(cauv, cau)
+    stressttov!(mr, cauv, cau)
     @test norm(cauv - stress) < 1.0e-10
     
 
@@ -140,7 +140,7 @@ function test()
     b = Fn1 * Fn1'
     cau = 2/J * (c1 + 2*c2*(tr(b) - 3)) * b + (K*(J - 1) - 2*c1/J) * I
     cauv = fill( 0.0 , 6)
-    stress3x3tto6v!(cauv, cau)
+    stressttov!(mr, cauv, cau)
     @test norm(cauv - stress) < 1.0e-10
     
     Fn1 = [1.1 -0.0333 0.07; 0.001 0.97 0; -0.01 -0.05 1.03]
@@ -151,7 +151,7 @@ function test()
     b = Fn1 * Fn1'
     cau = 2/J * (c1 + 2*c2*(tr(b) - 3)) * b + (K*(J - 1) - 2*c1/J) * I
     cauv = fill( 0.0 , 6)
-    stress3x3tto6v!(cauv, cau)
+    stressttov!(mr, cauv, cau)
     @test norm(cauv - stress) < 1.0e-10
     
 end
