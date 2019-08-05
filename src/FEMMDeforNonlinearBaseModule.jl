@@ -133,15 +133,12 @@ function _buff6(self::AbstractFEMMDeforNonlinear, geom::NodalField, u::NodalFiel
     elmatdim = ndn*nne;             # dimension of the element matrix
     # Prepare _buffers
     #  Indexing vector
-    idx = (1:ndn:(nne-1)*ndn+1);;      # element matrix -- buffer
-    idx1 = idx .+ 1
-    idx2 = idx .+ 2
+    idx = [(1:ndn:(nne-1)*ndn+1).+(i-1) for i in 1:sdim]; # indexing vector -- buffer
     elmat = fill(zero(FFlt), elmatdim, elmatdim);      # element matrix -- buffer
-    elmat1 = fill(zero(FFlt), elmatdim, elmatdim);      # element matrix -- buffer
     # to compute c1 = gradxmN*sigma*gradxmN';
     c1 = fill(zero(FFlt), nne, nne); # strain-displacement matrix -- buffer
     sg = fill(zero(FFlt), sdim, nne); # strain-displacement matrix -- buffer
-    return idx, idx1, idx2, elmat, elmat1, c1, sg
+    return idx, elmat, c1, sg
 end
 
 """
@@ -341,7 +338,7 @@ function geostiffness(self::AbstractFEMMDeforNonlinear, assembler::A, geom::Noda
     dofnums, loc, J, csmatTJ, gradXN, gradxmN = _buff1(self, geom, un1)
     X, xn, xn1, Un, Un1, Fn, Fn1, Fnm, Fn1m, RmTF = _buff3(self, geom, un1)
     cauchy, output, sigma = _buff5(self, geom, un1)
-    idx, idx1, idx2, elmat, elmat1, c1, sg = _buff6(self, geom, un1)
+    idx, elmat, c1, sg = _buff6(self, geom, un1)
     statev = deepcopy(self.statev) # work with copies of material state
     startassembly!(assembler, size(elmat, 1), size(elmat, 2), count(fes), un1.nfreedofs, un1.nfreedofs);
     for i = 1:count(fes) # Loop over elements
@@ -366,10 +363,10 @@ function geostiffness(self::AbstractFEMMDeforNonlinear, assembler::A, geom::Noda
             stressvtot!(self.material.mr, sigma, cauchy);
             fill!(c1, 0.0)
             add_gkgt_ut_only!(c1, gradxmN, Jac*w[j]*det(Fn1), sigma, sg)
-            elmat1[idx,idx]   .= c1;
-            elmat1[idx1,idx1] .= c1;
-            elmat1[idx2,idx2] .= c1;
-            elmat .+=  elmat1
+            complete_lt!(c1)
+            for d in 1:length(idx)
+            	elmat[idx[d],idx[d]]  .+= c1;
+            end
         end # Loop over quadrature points
         complete_lt!(elmat)
         gatherdofnums!(un1, dofnums, fes.conn[i]); # retrieve degrees of freedom
