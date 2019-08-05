@@ -23,12 +23,13 @@ function neohookeanad_q4()
     m = MatDeforNeohookeanAD(mr, E, nu)
     L= 6/2*phun("mm");
     W = 2/2*phun("mm");
+    H = 2/2*phun("mm");
     umag = 1.5*phun("mm");# Magnitude of the displacement
     nincr = 48
     utol = 10e-7;
     graphics = ~true;
     maxdu_tol = W/1e7;
-    maxiter = 5
+    maxiter = 15
     tolerance = W / 1000
 
     fens, fes = Q4block(L, W, 2, 1)
@@ -43,7 +44,7 @@ function neohookeanad_q4()
     move(x, lambda) = table(lambda);
     e4 = FDataDict("node_list"=>movel1, "component"=>1, "displacement"=>move)
 
-    femm = FEMMDeforNonlinear(mr, IntegDomain(fes, GaussRule(2, 2)), m)
+    femm = FEMMDeforNonlinear(mr, IntegDomain(fes, GaussRule(2, 2), H), m)
 
     region1 = FDataDict("femm"=>femm)
     modeldata =  FDataDict("fens"=> fens, "regions"=>  [region1],  "essential_bcs"=>[e1, e2, e4])
@@ -54,6 +55,10 @@ function neohookeanad_q4()
     modeldata["line_search"]  = true;
     modeldata["iteration_observer"] = (lambda, iter, du, modeldata) -> begin
         @show lambda, iter, modeldata["maxdu"], modeldata["maxbal"]
+        # print("-\n")
+        # @show modeldata["un1"]
+        # vtkexportmesh("junk$(iter).vtk", fens, fes; vectors = [("u", modeldata["un1"].values)])
+        # print("-\n")
     end
     Ux = FFlt[]; Rx = FFlt[]
     modeldata["increment_observer"] = (lambda, modeldata) -> begin
