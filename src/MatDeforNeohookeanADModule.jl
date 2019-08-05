@@ -39,6 +39,15 @@ function MatDeforNeohookeanAD(mr::Type{MR}, E::FFlt, nu::FFlt) where {MR}
 	return MatDeforNeohookeanAD(mr, mass_density, E, nu)
 end
 
+const D3D = DeforModelRed3D
+
+function strainenergy(Cv, lambda, mu)
+	trC = strainvtr(D3D, Cv)
+	J = sqrt(strainvdet(D3D, Cv))
+	lJ = log(J)
+	return mu/2*(trC-3) - mu*lJ + lambda/2*(lJ)^2;
+end
+
 ################################################################################
 # 3-D solid model
 ################################################################################
@@ -49,17 +58,11 @@ end
 Create triaxial neohookean hyperelastic material.
 """
 function MatDeforNeohookeanAD(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FFlt, nu::FFlt)
-	function strainenergy(Cv, mr, lambda, mu)
-		trC = strainvtr(mr, Cv)
-		J = sqrt(strainvdet(mr, Cv))
-		lJ = log(J)
-		return mu/2*(trC-3) - mu*lJ + lambda/2*(lJ)^2;
-	end
 	function tangentmoduli3d!(self::MatDeforNeohookeanAD, D::FFltMat, statev::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat, label::FInt)
 		C = Fn1'*Fn1;
 		Cv = fill(0.0, 6)
 		strainttov!(mr, Cv, C)
-		Dtotal = 4 .* hessian(Cv -> strainenergy(Cv, mr, self._lambda, self._mu), Cv);
+		Dtotal = 4 .* hessian(Cv -> strainenergy(Cv, self._lambda, self._mu), Cv);
 		return totalLagrangean2current!(D, Dtotal, Fn1)
 	end
 	function update3d!(self::MatDeforNeohookeanAD, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
@@ -67,7 +70,7 @@ function MatDeforNeohookeanAD(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::
 		C = Fn1'*Fn1;
 		Cv = fill(0.0, 6)
 		strainttov!(mr, Cv, C)
-		Sv = 2 * gradient(Cv -> strainenergy(Cv, mr, self._lambda, self._mu), Cv);
+		Sv = 2 * gradient(Cv -> strainenergy(Cv, self._lambda, self._mu), Cv);
 		S = fill(0.0, 3, 3)
 		stressvtot!(mr, S, Sv)
 		cauchyt = Fn1*(S/det(Fn1))*Fn1'; # Cauchy stress
@@ -108,20 +111,14 @@ end
 Create triaxial neohookean hyperelastic material.
 """
 function MatDeforNeohookeanAD(mr::Type{DeforModelRed2DStrain}, mass_density::FFlt, E::FFlt, nu::FFlt)
-	function strainenergy(Cv, mr, lambda, mu)
-		trC = strainvtr(mr, Cv)
-		J = sqrt(strainvdet(mr, Cv))
-		lJ = log(J)
-		return mu/2*(trC-3) - mu*lJ + lambda/2*(lJ)^2;
-	end
 	function tangentmoduli2dstrain!(self::MatDeforNeohookeanAD, D::FFltMat, statev::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat, label::FInt)
 		Fn13d = fill(0.0, 3, 3)
 		Fn13d[1:2, 1:2] = Fn1
 		Fn13d[3, 3] = 1.0
 		C = Fn13d'*Fn13d;
 		Cv = fill(0.0, 6)
-		strainttov!(mr, Cv, C)
-		Dtotal = 4 .* hessian(Cv -> strainenergy(Cv, mr, self._lambda, self._mu), Cv);
+		strainttov!(D3D, Cv, C)
+		Dtotal = 4 .* hessian(Cv -> strainenergy(Cv, self._lambda, self._mu), Cv);
 		Dcurrent = fill(0.0, size(Dtotal))
 		totalLagrangean2current!(Dcurrent, Dtotal, Fn13d)
 		fill!(D, 0.0)
@@ -136,12 +133,12 @@ function MatDeforNeohookeanAD(mr::Type{DeforModelRed2DStrain}, mass_density::FFl
 		Fn13d[3, 3] = 1.0
 		C = Fn13d'*Fn13d;
 		Cv = fill(0.0, 6)
-		strainttov!(mr, Cv, C)
-		Sv = 2 * gradient(Cv -> strainenergy(Cv, mr, self._lambda, self._mu), Cv);
+		strainttov!(D3D, Cv, C)
+		Sv = 2 * gradient(Cv -> strainenergy(Cv, self._lambda, self._mu), Cv);
 		S = fill(0.0, 3, 3)
-		stressvtot!(mr, S, Sv)
-		cauchyt = Fn13d*(S/det(Fn1))*Fn13d'; # Cauchy stress
-		stressttov!(mr, cauchy, cauchyt)
+		stressvtot!(D3D, S, Sv)
+		cauchyt = Fn13d*(S/det(Fn1))*Fn13d'; # Cauchy stress, 3D
+		stressttov!(mr, cauchy, cauchyt) # 2D stress vector
 		if quantity == :nothing
 			#Nothing to be copied to the output array
 		elseif quantity == :cauchy || quantity == :Cauchy
