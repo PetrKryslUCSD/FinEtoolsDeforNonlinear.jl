@@ -19,22 +19,24 @@ using DelimitedFiles
 using Interpolations
 using UnicodePlots
 
+filetag(v) = Float64(Int(round(v*100000))) / 100000
+
 function neohookeanad_q4()
     mr = DeforModelRed2DStrain
     E, nu = 7.0*phun("MPa"), 0.3
     m = MatDeforNeohookeanAD(mr, E, nu)
-    L= 6/2*phun("mm");
+    L= 101.0*phun("mm");
     W = 2/2*phun("mm");
     H = 2/2*phun("mm");
-    umag = 34.5*phun("mm");# Magnitude of the displacement
+    umag = 10.1*phun("mm");# Magnitude of the displacement
     nincr = 48
     utol = 10e-7;
     graphics = ~true;
     maxdu_tol = W/1e7;
     maxiter = 15
-    tolerance = 0.1 * phun("mm") / 1000
+    tolerance = 1.0 * phun("mm") / 10
 
-    output = MeshImportModule.import_ABAQUS("./bertoldi-specimen-1-mesh-0.001.inp")
+    output = MeshImportModule.import_ABAQUS("./bertoldi-specimen-1-mesh-0.002.inp")
     fens, fes = output["fens"], output["fesets"][1]
     fens.xyz = fens.xyz[:, 1:2]
     box = boundingbox(fens.xyz)
@@ -57,9 +59,19 @@ function neohookeanad_q4()
     move(x, lambda) = table(lambda);
     movel1 = l2 
     e4 = FDataDict("node_list"=>l2, "component"=>2, "displacement"=>move)
+    l3  = selectnode(fens; box = [box[1],box[1],-Inf,Inf], inflate  =  tolerance)
+    l4  = selectnode(fens; box = [box[2],box[2],-Inf,Inf], inflate  =  tolerance)
 
-vtkexportmesh("junk.vtk", fens, fes)
-fens.xyz .+= 0.1 .* phun("mm") .* 2.0 .* (rand(size(fens.xyz)...) .- 0.5)
+	xyz = deepcopy(fens.xyz)
+    vtkexportmesh("bertoldi_compression-boundary.vtk", fens, meshboundary(fes))
+
+# Perturbed the locations of the nodes in the interior
+    fens.xyz .+= 0.1 .* phun("mm") .* 2.0 .* (rand(size(fens.xyz)...) .- 0.5)
+    # Restore the coordinates of the points on the outer boundary
+    fens.xyz[l1, :] = xyz[l1, :]
+    fens.xyz[l2, :] = xyz[l2, :]
+    fens.xyz[l3, :] = xyz[l3, :]
+    fens.xyz[l4, :] = xyz[l4, :]
 
     femm = FEMMDeforNonlinear(mr, IntegDomain(fes, GaussRule(2, 2), H), m)
 
@@ -71,20 +83,21 @@ fens.xyz .+= 0.1 .* phun("mm") .* 2.0 .* (rand(size(fens.xyz)...) .- 0.5)
     modeldata["maxiter"] = maxiter;
     modeldata["line_search"]  = true;
     modeldata["iteration_observer"] = (lambda, iter, du, modeldata) -> begin
-        @show lambda, iter, modeldata["maxdu"], modeldata["maxbal"]
+        @show iter, modeldata["maxdu"], modeldata["maxbal"]
     end
     Ux = FFlt[]; Rx = FFlt[]
     modeldata["increment_observer"] = (lambda, modeldata) -> begin
-        push!(Ux, mean(modeldata["un1"].values[movel1,1]));
+    	@show lambda
+        push!(Ux, mean(modeldata["un1"].values[movel1,2]));
         push!(Rx, sum(modeldata["reactions"].values[movel1,2]));
-        vtkexportmesh("junk$(lambda).vtk", fens, fes; vectors = [("u", modeldata["un1"].values)])
+        vtkexportmesh("bertoldi_compression-$(filetag(lambda)).vtk", fens, fes; vectors = [("u", modeldata["un1"].values)])
     end
 
     modeldata = nonlinearstatics(modeldata);
     # @show Ux, Rx
     @show (minimum(Ux), minimum(Rx), maximum(Ux), maximum(Rx)) 
 
-    pl = lineplot((L .+ Ux) ./ L, Rx, canvas = DotCanvas)
+    pl = lineplot(Ux ./ L, Rx, canvas = DotCanvas)
     display(pl)
 end # function neohookeanad_q4
 
