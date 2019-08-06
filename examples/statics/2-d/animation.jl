@@ -9,6 +9,9 @@ filename(i) = begin
 	end
 end
 lambdas = collect(linearspace(0.0, 1.0, 49))
+for i in 1:10
+	push!(lambdas, lambdas[end])
+end
 for (i, lambda) in enumerate(lambdas[2:end])
 
 open(File, "w") do f
