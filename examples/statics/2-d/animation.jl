@@ -205,3 +205,5 @@ end
 run(`"pvpython" $File`)
 
 end
+
+run(`"C:\\Program Files\\ImageMagick-7.0.8-Q16\\magick.exe" -delay 20 snap0*.png anim.gif`)
