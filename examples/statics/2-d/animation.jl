@@ -1,3 +1,4 @@
+using FinEtools
 File = "snap.py"
 filetag(v) = Float64(Int(round(v*100000))) / 100000
 filename(i) = begin
@@ -13,7 +14,11 @@ for i in 1:10
 	push!(lambdas, lambdas[end])
 end
 for (i, lambda) in enumerate(lambdas[2:end])
-
+	VTKfile = "bertoldi_compression-$(filetag(lambda)).vtk"
+	@show s = stat(VTKfile) 
+if s.mode == 0o000000
+	break
+end
 open(File, "w") do f
 	print(f, """
 #### import the simple module from the paraview
@@ -83,7 +88,7 @@ renderView1.Update()
 renderView1.ResetCamera()
 
 # create a new 'Legacy VTK Reader'
-snapshotvtk = LegacyVTKReader(FileNames=['bertoldi_compression-$(filetag(lambda)).vtk'])
+snapshotvtk = LegacyVTKReader(FileNames=['$(VTKfile)'])
 
 # show data in view
 snapshotvtkDisplay = Show(snapshotvtk, renderView1)
