@@ -147,13 +147,14 @@ function neohookeanad_q8()
 	xyz = deepcopy(fens.xyz)
     vtkexportmesh("bertoldi_compression-boundary.vtk", fens, meshboundary(fes))
 
-# Perturbed the locations of the nodes in the interior
-    fens.xyz .+= 0.1 .* phun("mm") .* 2.0 .* (rand(size(fens.xyz)...) .- 0.5)
+    # Perturb the locations of the nodes in the interior
+    fens.xyz .+= 0.05 .* phun("mm") .* 2.0 .* (rand(size(fens.xyz)...) .- 0.5)
     # Restore the coordinates of the points on the outer boundary
     fens.xyz[l1, :] = xyz[l1, :]
     fens.xyz[l2, :] = xyz[l2, :]
     fens.xyz[l3, :] = xyz[l3, :]
     fens.xyz[l4, :] = xyz[l4, :]
+    # The mid-edge nodes should be at the midpoint
     for i in 1:count(fes)
     	k = fes.conn[i][5]
     	p = fes.conn[i][1]
