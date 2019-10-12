@@ -15,7 +15,7 @@ moment,  statics and hyper elastic materials are included.
 
 ## News
 
-- 07/28/2019: Implemented automatic differentiation in material models.
+- 10/12/2019: Corrected a design flaw in the matrix utilities module.
 
 [Past news](oldnews.md)
 
