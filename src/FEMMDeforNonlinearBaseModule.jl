@@ -170,7 +170,7 @@ function stiffness(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalFi
         @. xn1 = X + Un1; # current coordinates
         fill!(elmat,  0.0); # Initialize element matrix
         for j = 1:npts # Loop over quadrature points
-            locjac!(loc, J, geom.values, fes.conn[i], Ns[j], gradNparams[j])
+            locjac!(loc, J, X, Ns[j], gradNparams[j])
             Jac = Jacobianvolume(self.integdomain, J, loc, fes.conn[i], Ns[j]);
             updatecsmat!(self.mcsys, loc, J, fes.label[i]); Rm = self.mcsys.csmat
             # At_mul_B!(csmatTJ, self.mcsys.csmat, J); # local Jacobian matrix
@@ -230,7 +230,7 @@ function nzebcloads(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalF
             @. xn1 = X + Un1; # current coordinates
             fill!(elmat,  0.0); # Initialize element matrix
             for j = 1:npts # Loop over quadrature points
-                locjac!(loc, J, geom.values, fes.conn[i], Ns[j], gradNparams[j])
+                locjac!(loc, J, X, Ns[j], gradNparams[j])
                 Jac = Jacobianvolume(self.integdomain, J, loc, fes.conn[i], Ns[j]);
                 updatecsmat!(self.mcsys, loc, J, fes.label[i]); Rm = self.mcsys.csmat
                 # At_mul_B!(csmatTJ, self.mcsys.csmat, J); # local Jacobian matrix
@@ -294,7 +294,7 @@ function restoringforce(self::AbstractFEMMDeforNonlinear, assembler::A, geom::No
         @. xn1 = X + Un1; # current coordinates
         fill!(elvec,  0.0); # Initialize element matrix
         for j = 1:npts # Loop over quadrature points
-            locjac!(loc, J, geom.values, fes.conn[i], Ns[j], gradNparams[j])
+            locjac!(loc, J, X, Ns[j], gradNparams[j])
             Jac = Jacobianvolume(self.integdomain, J, loc, fes.conn[i], Ns[j]);
             updatecsmat!(self.mcsys, loc, J, fes.label[i]); Rm = self.mcsys.csmat
             # At_mul_B!(csmatTJ, self.mcsys.csmat, J); # local Jacobian matrix
@@ -349,7 +349,7 @@ function geostiffness(self::AbstractFEMMDeforNonlinear, assembler::A, geom::Noda
         @. xn1 = X + Un1; # current coordinates
         fill!(elmat,  0.0); # Initialize element matrix
         for j = 1:npts # Loop over quadrature points
-            locjac!(loc, J, geom.values, fes.conn[i], Ns[j], gradNparams[j])
+            locjac!(loc, J, X, Ns[j], gradNparams[j])
             Jac = Jacobianvolume(self.integdomain, J, loc, fes.conn[i], Ns[j]);
             updatecsmat!(self.mcsys, loc, J, fes.label[i]); Rm = self.mcsys.csmat
             # At_mul_B!(csmatTJ, self.mcsys.csmat, J); # local Jacobian matrix
