@@ -18,7 +18,7 @@ import ..FEMMDeforNonlinearBaseModule: stiffness, geostiffness, nzebcloads, rest
 import FinEtoolsDeforLinear.DeforModelRedModule: stresscomponentmap
 import FinEtools.ForceIntensityModule: ForceIntensity, settime!
 import FinEtools.MeshModificationModule: meshboundary
-import FinEtools.MeshExportModule: vtkexportmesh
+import FinEtools.MeshExportModule.VTK: vtkexportmesh
 import LinearAlgebra: eigen, qr, dot, cholesky, sum
 # using Debugger
 
