@@ -2,6 +2,7 @@ module m7test13a
 using FinEtools
 using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
+using FinEtoolsDeforNonlinear.MatDeforNonlinearModule: totalLagrangean2current!
 using LinearAlgebra: norm
 using BenchmarkTools
 using Test
@@ -42,6 +43,8 @@ function test()
     D2 = deepcopy(D)
     @test norm(D1-D2) / E < 1.0e-7
 
+@btime totalLagrangean2current!($D, $D2, rand(3, 3))
+    
     # Fn1 = [1.0 0 0; 0 1.01 0; 0 0 1.0]
     # Fn = [1.0 0 0; 0 1.0 0; 0 0 1.0]
     # update!(m, statev, stress, output, Fn1, Fn, tn, dtn, loc, label, quantity)
