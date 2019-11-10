@@ -41,6 +41,7 @@ end
 
 const D3D = DeforModelRed3D
 
+# Note that the strain energy is defined in terms of the right Cauchy-Green tensor.
 function strainenergy(Cv, lambda, mu)
 	trC = strainvtr(D3D, Cv)
 	J = sqrt(strainvdet(D3D, Cv))
