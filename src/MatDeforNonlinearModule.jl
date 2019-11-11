@@ -174,17 +174,32 @@ function totlag2currsymm!(c, C, F)
     return c
 end
 
-totlag2curr4th!(c, C, F) = begin
+"""
+    totlag2curr4th!(c, C, F)
+
+Convert a total Lagrangean constitutive matrix to a current Lagrangean one
+(sometimes known as "Eulerian").
+
+- `C`    = Lagrangean constitutive matrix, fourth-order tensor
+- `F`    = current deformation gradient, F_iJ = partial x_i / partial X_J
+
+The transformation is c_ijkl = 1/J C_IJKL F_iI F_jJ F_kK F_lL. Both the input
+and the output are fourth-order tensors.
+"""
+function totlag2curr4th!(c, C, F)
+	@assert size(F) == (3, 3)
+	@assert size(c) == (3, 3, 3, 3)
+	@assert size(C) == (3, 3, 3, 3)
     n = size(F, 1)
     c .= 0.0
-    for i in 1:n
-    	for j in 1:n
-    		for k in 1:n
-    			for l in 1:n
-    				for I in 1:n
-    					for J in 1:n
-    						for K in 1:n
-    							for L in 1:n
+    @inbounds for i in 1:n
+    	@inbounds for j in 1:n
+    		@inbounds for k in 1:n
+    			@inbounds for l in 1:n
+    				@inbounds for I in 1:n
+    					@inbounds for J in 1:n
+    						@inbounds for K in 1:n
+    							@inbounds for L in 1:n
     								c[i, j, k, l] += F[i, I] * F[j, J] * F[k, K] * F[l, L] * C[I, J, K, L]
     							end
     						end
