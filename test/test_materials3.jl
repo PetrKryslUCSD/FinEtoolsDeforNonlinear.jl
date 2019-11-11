@@ -61,7 +61,7 @@ m3test1a.test()
 module testelasticitytensor1
 using FinEtools
 using FinEtoolsDeforNonlinear.MatDeforNonlinearModule: totlag2currsymm!
-using FinEtoolsDeforLinear.MatDeforModule: tens4symmto6x6t!
+using FinEtoolsDeforLinear.MatDeforModule: tens4symmtto6x6t!
 using LinearAlgebra
 using Test
 
@@ -76,7 +76,7 @@ function test()
 		mu * (delta(I, K) * delta(J, L) + delta(I, L) * delta(J, K))
 	end
 	Cm = fill(0.0, 6, 6)
-	tens4symmto6x6t!(Cm, C)
+	tens4symmtto6x6t!(Cm, C)
 	c = fill(0.0, 6, 6)
 	totlag2currsymm!(c, Cm, F)
 	c2 = fill(0.0, 3, 3, 3, 3)
@@ -87,7 +87,7 @@ function test()
 		end
 	end
 	c2m = fill(0.0, 6, 6)
-	tens4symmto6x6t!(c2m, c2)
+	tens4symmtto6x6t!(c2m, c2)
 	@test norm(c - c2m) <= 1.0e-12
 end
 end
