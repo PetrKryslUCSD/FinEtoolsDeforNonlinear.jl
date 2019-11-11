@@ -3,7 +3,7 @@ module MatDeforStVKModule
 using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, FIntMat, FMat, FVec, FDataDict
 import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed3D, DeforModelRed2DStrain, DeforModelRed2DStress, DeforModelRed2DAxisymm, DeforModelRed1D, nstressstrain, nthermstrain
 import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stressvtot!, stressttov!, strainttov!
-import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, totalLagrangean2current!
+import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, totlag2currsymm!
 import LinearAlgebra: Transpose, Diagonal, mul!
 At_mul_B!(C, A, B) = mul!(C, Transpose(A), B)
 A_mul_B!(C, A, B) = mul!(C, A, B)
@@ -55,8 +55,7 @@ function MatDeforStVK(mr::Type{DeforModelRed3D}, mass_density::FFlt, E1::FFlt, E
 	_D = inv(compliance);
 	_I3 = [1.0 0 0; 0 1.0 0; 0 0 1.0]
 	function tangentmoduli3d!(self::MatDeforStVK, D::FFltMat, statev::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat, label::FInt)
-		J = det(Fn1);
-		return totalLagrangean2current!(D, self._D, Fn1)
+		return totlag2currsymm!(D, self._D, Fn1)
 	end
 	function update3d!(self::MatDeforStVK, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
 		@assert length(cauchy) == nstressstrain(self.mr)

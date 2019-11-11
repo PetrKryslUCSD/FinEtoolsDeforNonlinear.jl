@@ -3,7 +3,7 @@ module MatDeforNeohookeanADModule
 using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, FIntMat, FMat, FVec, FDataDict
 import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed3D, DeforModelRed2DStrain, DeforModelRed2DStress, DeforModelRed2DAxisymm, DeforModelRed1D, nstressstrain, nthermstrain
 import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stressvtot!, stressttov!, strainttov!, strainvdet, strainvtr
-import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, totalLagrangean2current!
+import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, totlag2currsymm!
 using LinearAlgebra: Transpose, Diagonal, mul!
 At_mul_B!(C, A, B) = mul!(C, Transpose(A), B)
 A_mul_B!(C, A, B) = mul!(C, A, B)
@@ -64,7 +64,7 @@ function MatDeforNeohookeanAD(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::
 		Cv = fill(0.0, 6)
 		strainttov!(mr, Cv, C)
 		Dtotal = 4 .* hessian(Cv -> strainenergy(Cv, self._lambda, self._mu), Cv);
-		return totalLagrangean2current!(D, Dtotal, Fn1)
+		return totlag2currsymm!(D, Dtotal, Fn1)
 	end
 	function update3d!(self::MatDeforNeohookeanAD, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
 		@assert length(cauchy) == nstressstrain(self.mr)
@@ -121,7 +121,7 @@ function MatDeforNeohookeanAD(mr::Type{DeforModelRed2DStrain}, mass_density::FFl
 		strainttov!(D3D, Cv, C)
 		Dtotal = 4 .* hessian(Cv -> strainenergy(Cv, self._lambda, self._mu), Cv);
 		Dcurrent = fill(0.0, size(Dtotal))
-		totalLagrangean2current!(Dcurrent, Dtotal, Fn13d)
+		totlag2currsymm!(Dcurrent, Dtotal, Fn13d)
 		fill!(D, 0.0)
 		D[1:2, 1:2] = Dcurrent[1:2, 1:2]
 		D[3, 3] = Dcurrent[4, 4]

@@ -60,7 +60,7 @@ m3test1a.test()
 
 module testelasticitytensor1
 using FinEtools
-using FinEtoolsDeforNonlinear.MatDeforNonlinearModule: totalLagrangean2current!
+using FinEtoolsDeforNonlinear.MatDeforNonlinearModule: totlag2currsymm!
 using FinEtoolsDeforLinear.MatDeforModule: tens4symmto6x6t!
 using LinearAlgebra
 using Test
@@ -78,7 +78,7 @@ function test()
 	Cm = fill(0.0, 6, 6)
 	tens4symmto6x6t!(Cm, C)
 	c = fill(0.0, 6, 6)
-	totalLagrangean2current!(c, Cm, F)
+	totlag2currsymm!(c, Cm, F)
 	c2 = fill(0.0, 3, 3, 3, 3)
 	for i in 1:3, j in 1:3, k in 1:3, l in 1:3
 		c2[i, j, k, l] = 0.0

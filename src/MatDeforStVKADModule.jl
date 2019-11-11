@@ -3,7 +3,7 @@ module MatDeforStVKADModule
 using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, FIntMat, FMat, FVec, FDataDict
 import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed3D, DeforModelRed2DStrain, DeforModelRed2DStress, DeforModelRed2DAxisymm, DeforModelRed1D, nstressstrain, nthermstrain
 import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stressvtot!, stressttov!, strainttov!
-import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, totalLagrangean2current!
+import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, totlag2currsymm!
 import LinearAlgebra: Transpose, Diagonal, mul!
 At_mul_B!(C, A, B) = mul!(C, Transpose(A), B)
 A_mul_B!(C, A, B) = mul!(C, A, B)
@@ -67,7 +67,7 @@ function MatDeforStVKAD(mr::Type{DeforModelRed3D}, mass_density::FFlt, E1::FFlt,
 		Egl = fill(0.0, nstressstrain(self.mr))
 		strainttov!(mr, Egl, E);
 		Dtotal = hessian(Egl -> strainenergy(self._D, Egl), Egl)
-		return totalLagrangean2current!(D, Dtotal, Fn1)
+		return totlag2currsymm!(D, Dtotal, Fn1)
 	end
 	function update3d!(self::MatDeforStVKAD, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
 		@assert length(cauchy) == nstressstrain(self.mr)
