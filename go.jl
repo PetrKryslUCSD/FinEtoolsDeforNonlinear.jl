@@ -1,6 +1,6 @@
-using Pkg
-Pkg.activate(".")
-# Pkg.instantiate()
+susing Pkg
+Pkg.activate(".")  
+Pkg.instantiate()
 using FinEtoolsDeforNonlinear
 # include("test/playground.jl")
 Pkg.test()
