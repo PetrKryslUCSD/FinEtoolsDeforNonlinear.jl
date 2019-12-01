@@ -7,4 +7,5 @@
 *.csv
 *.CSV
 *.sublime-workspace
+*~
 docs/build/
