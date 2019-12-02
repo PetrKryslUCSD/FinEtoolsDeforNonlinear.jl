@@ -1,12 +1,12 @@
-module cantilever_examples
+module cantilever_dyn_examples
 
 using FinEtools
 using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
-using FinEtoolsDeforLinear: FEMMDeforLinear
+using FinEtoolsDeforLinear: FEMMDeforLinear, lumpedmass
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using FinEtoolsDeforNonlinear.AlgoDeforNonlinearModule: nonlinearstatics
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness, geostiffness, nzebcloads, restoringforce, estimatestablestep
 using LinearAlgebra: norm
 using Statistics: mean
 using SparseArrays
@@ -22,11 +22,8 @@ function neohookean_h8()
     H = 2/2*phun("mm");
     W = 2/2*phun("mm");
     tmag = 0.2*phun("MPa");# Magnitude of the traction
-    nincr = 8
     utol = 10e-7;
     graphics = ~true;
-    maxdu_tol = W/1e7;
-    maxiter = 9
     tolerance = W / 1000
     traction_vector = [0.0, 0.0, -tmag]
     tend = 1.0
@@ -36,52 +33,51 @@ function neohookean_h8()
     u = NodalField(zeros(size(fens.xyz,1),3))
 
     l1  = selectnode(fens; box = [0,0,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
-    setebc!(u, l1, true, 1:3, 0.0)
-    
+    for i in 1:3
+        setebc!(u, l1, true, i, 0.0)
+    end
     applyebc!(u)
     numberdofs!(u)
     
     bfes = meshboundary(fes)
     el1 = selectelem(fens, bfes, box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
     setvector!(v, XYZ::FFltMat, tangents::FFltMat, fe_label::FInt; time::FFlt = 0.0) = begin
-        v .= time .* traction_vector
+        v .= 1.0 .* traction_vector
         return v
     end
     fi = ForceIntensity(FFlt, length(traction_vector), setvector!, 0.0);
-    eL1femm =  FEMMBase(IntegDomain(subset(bdryfes, el1), GaussRule(2, 2)))
+    eL1femm =  FEMMBase(IntegDomain(subset(bfes, el1), GaussRule(2, 2)))
     FL = distribloads(eL1femm, geom, u, fi, 2);
     
     movel1  = selectnode(fens; box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
 
     femm = FEMMDeforNonlinear(mr, IntegDomain(fes, GaussRule(3, 2)), m)
     femm = associategeometry!(femm, geom)
-    
-    
-    iteration_observer = (lambda, iter, du, modeldata) -> begin
-        @show lambda, iter, modeldata["maxdu"], modeldata["maxbal"]
-    end
-    
-    Ux = FFlt[]; ts = FFlt[]
-    increment_observer = (t, un1) -> begin
-        push!(Ux, mean(un1.values[movel1,3]));
-        push!(ts, t);
-    end
 
-    un1 = clone(u)
-    un = clone(u)
-    vn1 = clone(u)
+    # Ux = FFlt[]; ts = FFlt[]
+    # increment_observer = (t, un1) -> begin
+    #     push!(Ux, mean(un1.values[movel1,3]));
+    #     push!(ts, t);
+    # end
+
+    un1 = deepcopy(u)
+    un = deepcopy(u)
+    vn1 = deepcopy(u)
     
     stabldt = estimatestablestep(femm, geom);
-
+    M = lumpedmass(femm, geom, un1)
+    
+    dt = stabldt
     t = 0.0
     # Initial displacement, velocity, and acceleration.
     U0 = gathersysvec(un1);
+    @show size(U0)
     V0 = gathersysvec(vn1);
     # The acceleration will be computed from the initial loads.
     A0 = deepcopy(V0);
     F0 = deepcopy(V0);
     # Temporary vectors
-    U1 = deepcopy(U1);
+    U1 = deepcopy(U0);
     V1 = deepcopy(V0);
     A1 = deepcopy(A0);
     F1 = deepcopy(F0); 
@@ -118,25 +114,22 @@ function neohookean_h8()
         end
         t = t+dt;
         increment_observer(t,model_data);
-        end
     end
-    
-    @show Ux / phun("mm"), lambdas
 
-    pl = lineplot(Ux / phun("mm"), lambdas)
-    display(pl)
+    # @show Ux / phun("mm"), ts
 
-    vtkexportmesh("neohookean_h8.vtk", fens, fes; vectors = [("u", modeldata["un1"].values)])
+    # pl = lineplot(Ux / phun("mm"), ts)
+    # display(pl)
+
+    vtkexportmesh("neohookean_h8.vtk", fens, fes; vectors = [("u", un1.values)])
+    true
 end # function neohookean_h8
 
 function allrun()
     println("#####################################################")
     println("# neohookean_h8 ")
-    neohookean_h8()
-    println("#####################################################")
-    println("# neohookean_h20 ")
-    neohookean_h20()
+    neohookean_h8()             # cantilever_dyn_examples.neohookean_h8()
     return true
-end # function allrun
+end # function allrun (setq term-suppress-hard-newline nil)
 
-end # module cantilever_examples
+end # module cantilever_dyn_examples

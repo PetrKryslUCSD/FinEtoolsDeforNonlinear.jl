@@ -19,7 +19,7 @@ import FinEtools.MatModule: massdensity
 import FinEtoolsDeforLinear.DeforModelRedModule: nstressstrain, nthermstrain, Blmat!, divmat, vgradmat
 import FinEtoolsDeforLinear.MatDeforModule: rotstressvec!, stressvtot!
 import FinEtoolsDeforLinear.FEMMDeforLinearBaseModule: AbstractFEMMDeforLinear
-import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, tangentmoduli!, update!
+import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, tangentmoduli!, update!, estimatesoundspeed
 import FinEtools.SurfaceNormalModule: SurfaceNormal, updatenormal!
 import LinearAlgebra: Transpose, mul!
 At_mul_B!(C, A, B) = mul!(C, Transpose(A), B)
@@ -380,6 +380,35 @@ function geostiffness(self::AbstractFEMMDeforNonlinear, geom::NodalField{FFlt}, 
     return geostiffness(self, assembler, geom, un1, un, tn, dtn);
 end
 
+function estimatestablestep(self::AbstractFEMMDeforNonlinear, geom::NodalField{FFlt}) 
+    fes = self.integdomain.fes
+    npts,  Ns,  gradNparams,  w,  pc = integrationdata(self.integdomain);
+    nne = nodesperelem(fes); # number of nodes for element
+    sdim = ndofs(geom);            # number of space dimensions
+    X = fill(zero(FFlt), nne, sdim)
+    # The formula below is strictly speaking only applicable in three
+    # dimensions for isotropic materials.  This needs to be generalized at
+    # some point.
+    speed_of_sound = estimatesoundspeed(self.material);
+    dsq = (X1,X2) -> sum((X2-X1).^2);
+    stabldt = Inf;
+    for i = 1:count(fes) # Loop over elements
+        gathervalues_asmat!(geom, X, fes.conn[i]);
+        for j = 1:npts # Loop over quadrature points
+            # Find the minimum  pairwise distance between nodes
+            mind = Inf;
+            for  i in 1:length(fes.conn[i])
+                for  j in (i+1):length(fes.conn[i])
+                    mind = min(mind, dsq(X[i,:],X[j,:]));
+                end
+            end
+            mind = sqrt(mind);
+            # Estimate the stable time step as the traversal time
+            stabldt = min(stabldt, mind/speed_of_sound);
+        end # Loop over quadrature points
+    end # Loop over elements
+    return stabldt
+end
 #
 # """
 #     inspectintegpoints(self::AbstractFEMMDeforNonlinear,

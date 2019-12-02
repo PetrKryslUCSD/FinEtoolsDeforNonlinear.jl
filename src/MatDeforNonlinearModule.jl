@@ -90,6 +90,16 @@ function newstate(self::M) where {M<:AbstractMatDeforNonlinear}
 end
 
 """
+    estimatesoundspeed(self::M)  where {M<:AbstractMatDeforNonlinear}
+
+Estimate sound speed in the undeformed state.
+"""
+function estimatesoundspeed(self::M)  where {M<:AbstractMatDeforNonlinear}
+    return 0.0
+end
+
+
+"""
     totlag2curr!(c, C, F)
 
 Convert a total Lagrangean constitutive matrix to a current Lagrangean one

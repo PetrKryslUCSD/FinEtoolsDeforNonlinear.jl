@@ -21,4 +21,8 @@ function MatDeforNeohookean(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FF
 If we create a deep copy of the material, these buffers should be thread safe. Needs to be checked, though.
 
 
-
+- Estimation of stable time step
+# The formula below is strictly speaking only applicable in three
+    # dimensions for isotropic materials.  This needs to be generalized at
+    # some point.
+    speed_of_sound = sqrt(self.material.property.E / (1 - 2*self.material.property.nu) / self.material.property.rho);
