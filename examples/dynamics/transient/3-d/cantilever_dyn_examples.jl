@@ -17,16 +17,17 @@ using UnicodePlots
 function neohookean_h8()
     mr = DeforModelRed3D
     E, nu = 7.0*phun("MPa"), 0.3
-    m = MatDeforNeohookean(mr, E, nu)
+    mass_density = 1000.0*phun("kg/m^3")
+    m = MatDeforNeohookean(mr, mass_density, E, nu)
     L= 6/2*phun("mm");
     H = 2/2*phun("mm");
     W = 2/2*phun("mm");
-    tmag = 0.2*phun("MPa");# Magnitude of the traction
+    tmag = 0.02*phun("MPa");# Magnitude of the traction
     utol = 10e-7;
     graphics = ~true;
     tolerance = W / 1000
     traction_vector = [0.0, 0.0, -tmag]
-    tend = 1.0
+    tend = 1.0e-3
 
     fens, fes = H8block(L, W, H, 16, 9, 9)
     geom = NodalField(fens.xyz)
@@ -54,72 +55,74 @@ function neohookean_h8()
     femm = FEMMDeforNonlinear(mr, IntegDomain(fes, GaussRule(3, 2)), m)
     femm = associategeometry!(femm, geom)
 
-    # Ux = FFlt[]; ts = FFlt[]
-    # increment_observer = (t, un1) -> begin
-    #     push!(Ux, mean(un1.values[movel1,3]));
-    #     push!(ts, t);
-    # end
+    Ux = FFlt[]; ts = FFlt[]
+    increment_observer = (step, t, un1) -> begin
+    	if rem(step, 100) == 0
+    		println("step = $(step)")
+    	    push!(Ux, mean(un1.values[movel1,3]));
+    	    push!(ts, t);
+    	end
+    end
 
     un1 = deepcopy(u)
     un = deepcopy(u)
     vn1 = deepcopy(u)
     
-    stabldt = estimatestablestep(femm, geom);
+    @show stabldt = estimatestablestep(femm, geom);
     M = lumpedmass(femm, geom, un1)
+    invMv = [1.0 / M[idx, idx] for idx in 1:size(M, 1)] 
     
-    dt = stabldt
-    t = 0.0
+    dtn = 0.8 * stabldt
+    tn = 0.0
     # Initial displacement, velocity, and acceleration.
-    U0 = gathersysvec(un1);
-    @show size(U0)
-    V0 = gathersysvec(vn1);
+    Un = gathersysvec(un1);
+    Vn = gathersysvec(vn1);
     # The acceleration will be computed from the initial loads.
-    A0 = deepcopy(V0);
-    F0 = deepcopy(V0);
+    An = deepcopy(Vn);
+    Fn = deepcopy(Vn);
     # Temporary vectors
-    U1 = deepcopy(U0);
-    V1 = deepcopy(V0);
-    A1 = deepcopy(A0);
-    F1 = deepcopy(F0); 
+    Un1 = deepcopy(Un);
+    Vn1 = deepcopy(Vn);
+    An1 = deepcopy(An);
     step = 0;
-    while t < tend
+    while tn < tend
         step = step + 1      # Step counter
-        fill!(F0, 0.0) # Zero out the load
-        F0 .= F0 .+ FL # Add on the time-independent load vector
+        fill!(Fn, 0.0) # Zero out the load
+        Fn .= Fn .+ FL # Add on the time-independent load vector
         # If this is the first step compute the initial acceleration.
         if step == 1
-            A0 = M\F0;
+            An = invMv .* Fn;
         end
         # Update the displacements
-        @. U1 = U0 + dt*V0 + ((dt^2)/2)*A0;# displacement update
-        scattersysvec!(un1, U1);
+        @. Un1 = Un + dtn*Vn + ((dtn^2)/2)*An;# displacement update
+        scattersysvec!(un1, Un1);
         # Add the restoring forces, starting from the time-independent load.
-        F0 .+= restoringforce(femm, geom, un1, un, t, dt, savestate = true)
+        Fn .+= restoringforce(femm, geom, un1, un, tn, dtn, true)
         # Compute the new acceleration.
-        A1 = M\F0;
+        A1 = invMv .* Fn;
         # Update the velocity
-        @. V1 = V0 + (dt/2) * (A0+A1);
+        @. Vn1 = Vn + (dtn/2) * (An+An1);
         # Bring the the displacement and velocity fields up to date
-        scattersysvec!(vn1, V1);
-        # Switch the temporary vectors for the next step.
-        (U0, U1) = (U1, U0);
-        (V0, V1) = (V1, V0);
-        (A0, A1) = (A1, A0);
+        scattersysvec!(vn1, Vn1);
+        # Switch the temporaries for the next step.
+        (Un, Un1) = (Un1, Un);
+        (Vn, Vn1) = (Vn1, Vn);
+        (An, An1) = (An1, An);
         (un, un1) = (un1, un);
-        if (t == tend)   # are we at the end?
+        if (tn == tend)   # are we at the end?
             break;
         end
-        if (t+dt > tend) # If the next step would take us beyond the end,
-            dt = tend-t; # hit the end precisely.
+        if (tn+dtn > tend) # If the next step would take us beyond the end,
+            dtn = tend-tn; # hit the end precisely.
         end
-        t = t+dt;
-        increment_observer(t,model_data);
+        tn = tn+dtn;
+        increment_observer(step, tn, un1);
     end
 
     # @show Ux / phun("mm"), ts
 
-    # pl = lineplot(Ux / phun("mm"), ts)
-    # display(pl)
+    pl = lineplot(ts, Ux / phun("mm"), canvas = DotCanvas)
+    display(pl)
 
     vtkexportmesh("neohookean_h8.vtk", fens, fes; vectors = [("u", un1.values)])
     true
