@@ -3,7 +3,7 @@ Pkg.activate(".")
 Pkg.instantiate()
 using FinEtoolsDeforNonlinear
 # include("test/playground.jl")
-# Pkg.test()
+Pkg.test()
 
 # include(".\\examples\\statics\\2-d\\tension_compression_examples.jl");
 # tension_compression_examples.neohookeanad_q4()
