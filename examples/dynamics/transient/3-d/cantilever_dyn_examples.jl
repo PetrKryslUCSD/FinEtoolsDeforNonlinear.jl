@@ -22,7 +22,7 @@ function neohookean_h8()
     L= 6/2*phun("mm");
     H = 2/2*phun("mm");
     W = 2/2*phun("mm");
-    tmag = 0.02*phun("MPa");# Magnitude of the traction
+    tmag = 0.2*phun("MPa");# Magnitude of the traction
     tolerance = W / 1000
     traction_vector = [0.0, 0.0, -tmag]
     tend = 0.25e-3
@@ -37,39 +37,39 @@ function neohookean_h8()
     end
     applyebc!(u)
     numberdofs!(u)
-    
+
     bfes = meshboundary(fes)
     el1 = selectelem(fens, bfes, box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
-    setvector!(v, XYZ::FFltMat, tangents::FFltMat, fe_label::FInt; time::FFlt = 0.0) = begin
+    function setvector!(v, XYZ::FFltMat, tangents::FFltMat, fe_label::FInt; time::FFlt = 0.0)
         v .= 1.0 .* traction_vector
         return v
     end
     fi = ForceIntensity(FFlt, length(traction_vector), setvector!, 0.0);
     eL1femm =  FEMMBase(IntegDomain(subset(bfes, el1), GaussRule(2, 2)))
     FL = distribloads(eL1femm, geom, u, fi, 2);
-    
+
     movel1  = selectnode(fens; box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
 
     femm = FEMMDeforNonlinear(mr, IntegDomain(fes, GaussRule(3, 2)), m)
     femm = associategeometry!(femm, geom)
 
     Ux = FFlt[]; ts = FFlt[]
-    increment_observer = (step, t, un1) -> begin
-    	if rem(step, 100) == 0
-    		println("step = $(step)")
-    	    push!(Ux, mean(un1.values[movel1,3]));
-    	    push!(ts, t);
-    	end
+    function increment_observer(step, t, un1)
+        if rem(step, 100) == 0
+            println("step = $(step)")
+            push!(Ux, mean(un1.values[movel1,3]));
+            push!(ts, t);
+        end
     end
 
     un1 = deepcopy(u)
     un = deepcopy(u)
     vn1 = deepcopy(u)
-    
+
     @show stabldt = estimatestablestep(femm, geom);
     M = lumpedmass(femm, geom, un1)
     invMv = [1.0 / M[idx, idx] for idx in 1:size(M, 1)] 
-    
+
     dtn = 0.8 * stabldt
     tn = 0.0
     # Initial displacement, velocity, and acceleration.
