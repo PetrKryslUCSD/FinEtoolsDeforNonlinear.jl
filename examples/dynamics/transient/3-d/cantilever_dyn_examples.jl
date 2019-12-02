@@ -23,8 +23,6 @@ function neohookean_h8()
     H = 2/2*phun("mm");
     W = 2/2*phun("mm");
     tmag = 0.02*phun("MPa");# Magnitude of the traction
-    utol = 10e-7;
-    graphics = ~true;
     tolerance = W / 1000
     traction_vector = [0.0, 0.0, -tmag]
     tend = 0.25e-3
