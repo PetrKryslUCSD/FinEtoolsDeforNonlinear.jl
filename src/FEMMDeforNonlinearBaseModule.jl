@@ -14,7 +14,7 @@ import FinEtools.FieldModule: ndofs, gatherdofnums!, gatherfixedvalues_asvec!, g
 import FinEtools.NodalFieldModule: NodalField, nnodes
 import FinEtools.AssemblyModule: AbstractSysvecAssembler, AbstractSysmatAssembler, SysmatAssemblerSparseSymm, startassembly!, assemble!, makematrix!, makevector!, SysvecAssembler
 import FinEtools.CSysModule: CSys, updatecsmat!
-import FinEtools.MatrixUtilityModule: add_btdb_ut_only!, complete_lt!, add_btv!, locjac!, add_nnt_ut_only!, add_gkgt_ut_only!
+import FinEtools.MatrixUtilityModule: add_btdb_ut_only!, complete_lt!, add_btv!, locjac!, add_nnt_ut_only!, add_gkgt_ut_only!, add_btsigma!
 import FinEtools.MatModule: massdensity
 import FinEtoolsDeforLinear.DeforModelRedModule: nstressstrain, nthermstrain, Blmat!, divmat, vgradmat
 import FinEtoolsDeforLinear.MatDeforModule: rotstressvec!, stressvtot!
@@ -306,7 +306,8 @@ function restoringforce(self::AbstractFEMMDeforNonlinear, assembler::A, geom::No
             update!(self.material, statev[i][j], cauchy, output, Fn1m, Fnm, tn, dtn, loc, fes.label[i])
             A_mul_B!(gradxmN, (gradXN / Fn1), Rm)
             Blmat!(self.mr, B, Ns[j], gradxmN, loc, Rm); # local strain-global disp
-            elvec = elvec - B'* (cauchy * (Jac * w[j] * det(Fn1))); # note the sign
+            # elvec .= elvec .- B'* (cauchy * (Jac * w[j] * det(Fn1))); # note the sign
+            add_btsigma!(elvec, B, - Jac * w[j] * det(Fn1), cauchy)
         end # Loop over quadrature points
         gatherdofnums!(un1, dofnums, fes.conn[i]); # retrieve degrees of freedom
         assemble!(assembler, elvec, dofnums); # assemble symmetric matrix

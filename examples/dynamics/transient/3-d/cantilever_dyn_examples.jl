@@ -27,7 +27,7 @@ function neohookean_h8()
     graphics = ~true;
     tolerance = W / 1000
     traction_vector = [0.0, 0.0, -tmag]
-    tend = 1.0e-3
+    tend = 0.25e-3
 
     fens, fes = H8block(L, W, H, 16, 9, 9)
     geom = NodalField(fens.xyz)
@@ -91,7 +91,8 @@ function neohookean_h8()
         Fn .= Fn .+ FL # Add on the time-independent load vector
         # If this is the first step compute the initial acceleration.
         if step == 1
-            An = invMv .* Fn;
+            An .= invMv .* Fn;
+            # An .= M \ Fn;
         end
         # Update the displacements
         @. Un1 = Un + dtn*Vn + ((dtn^2)/2)*An;# displacement update
@@ -99,11 +100,12 @@ function neohookean_h8()
         # Add the restoring forces, starting from the time-independent load.
         Fn .+= restoringforce(femm, geom, un1, un, tn, dtn, true)
         # Compute the new acceleration.
-        A1 = invMv .* Fn;
+        An1 .= invMv .* Fn;
+        # An1 .= M \ Fn;
         # Update the velocity
         @. Vn1 = Vn + (dtn/2) * (An+An1);
         # Bring the the displacement and velocity fields up to date
-        scattersysvec!(vn1, Vn1);
+        # scattersysvec!(vn1, Vn1);
         # Switch the temporaries for the next step.
         (Un, Un1) = (Un1, Un);
         (Vn, Vn1) = (Vn1, Vn);
