@@ -8,6 +8,8 @@ using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanNaiveModule: MatDeforNeohookeanNaive
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness, geostiffness, nzebcloads, restoringforce, estimatestablestep
+
+using FinEtoolsDeforNonlinear.AssemblyModule: SysvecAssemblerOpt
 using LinearAlgebra: norm
 using Statistics: mean
 using SparseArrays
@@ -83,6 +85,8 @@ function neohookean_h8()
     Un1 = deepcopy(Un);
     Vn1 = deepcopy(Vn);
     An1 = deepcopy(An);
+    # Global vector assembler
+    assembler = SysvecAssemblerOpt(deepcopy(Un1), length(Un1))
     step = 0;
     while tn < tend
         step = step + 1      # Step counter
@@ -97,7 +101,7 @@ function neohookean_h8()
         @. Un1 = Un + dtn*Vn + ((dtn^2)/2)*An;# displacement update
         scattersysvec!(un1, Un1);
         # Add the restoring forces, starting from the time-independent load.
-        Fn .+= restoringforce(femm, geom, un1, un, tn, dtn, true)
+        Fn .+= restoringforce(femm, assembler, geom, un1, un, tn, dtn, true)
         # Compute the new acceleration.
         An1 .= invMv .* Fn;
         # An1 .= M \ Fn;
