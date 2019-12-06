@@ -1,4 +1,4 @@
-module MatDeforNeohookeanModule
+module MatDeforNeohookeanNaiveModule
 
 using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, FIntMat, FMat, FVec, FDataDict
 import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed3D, DeforModelRed2DStrain, DeforModelRed2DStress, DeforModelRed2DAxisymm, DeforModelRed1D, nstressstrain, nthermstrain
@@ -11,16 +11,12 @@ import LinearAlgebra: eigen, eigvals, norm, cholesky, cross, dot, log, diagm, de
 
 
 """
-	MatDeforNeohookean{MR<:AbstractDeforModelRed, MTAN<:Function, MUPD<:Function} <: AbstractMatDeforNonlinear
+	MatDeforNeohookeanNaive{MR<:AbstractDeforModelRed, MTAN<:Function, MUPD<:Function} <: AbstractMatDeforNonlinear
 
 Type for triaxial neohookean hyperelastic material.
 
-!!! note
-The material object is not thread safe. It holds temporary arrays.
-If the object is to be used in a multi-threaded environment, each thread must
-have its own private copy.
 """
-struct  MatDeforNeohookean{MR<:AbstractDeforModelRed, MTAN<:Function, MUPD<:Function} <: AbstractMatDeforNonlinear
+struct  MatDeforNeohookeanNaive{MR<:AbstractDeforModelRed, MTAN<:Function, MUPD<:Function} <: AbstractMatDeforNonlinear
     mr::Type{MR} # model reduction type
     mass_density::FFlt # mass density
     E::FFlt # Young's modulus
@@ -29,11 +25,6 @@ struct  MatDeforNeohookean{MR<:AbstractDeforModelRed, MTAN<:Function, MUPD<:Func
     _mu::FFlt
     tangentmoduli!::MTAN # Function to return the tangent moduli matrix
     update!::MUPD # Function to update the material state
-    _mI::FFltMat # Private temporary
-    _m1m1::FFltMat # Private temporary
-    _I3::FFltMat # Private temporary
-    _b::FFltMat # Private temporary
-    _sigma::FFltMat # Private temporary
 end
 
 # function _threedD(E::FFlt, nu::FFlt)
@@ -51,24 +42,27 @@ end
 ################################################################################
 
 """
-    MatDeforNeohookean(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FFlt, nu::FFlt)
+    MatDeforNeohookeanNaive(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FFlt, nu::FFlt)
 
 Create triaxial neohookean hyperelastic material.
-    """
-function MatDeforNeohookean(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FFlt, nu::FFlt)
+"""
+function MatDeforNeohookeanNaive(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FFlt, nu::FFlt)
+    _mI = diagm(0=>[1, 1, 1, 0.5, 0.5, 0.5]);
     _m1 = vec(FFlt[1 1 1 0 0 0]) ;
-    function tangentmoduli3d!(self::MatDeforNeohookean, D::FFltMat, statev::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat, label::FInt)
+    _m1m1 = _m1*_m1';
+    _I3 = [1.0 0 0; 0 1.0 0; 0 0 1.0]
+    function tangentmoduli3d!(self::MatDeforNeohookeanNaive, D::FFltMat, statev::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat, label::FInt)
 		J = det(Fn1);
-		copyto!(D, (self._lambda / J) * self._m1m1 + 2 * (self._mu - self._lambda*log(J))/J * self._mI);
+		copyto!(D, (self._lambda / J) * _m1m1 + 2 * (self._mu - self._lambda*log(J))/J * _mI);
 		return D
     end
-    function update3d!(self::MatDeforNeohookean, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
+    function update3d!(self::MatDeforNeohookeanNaive, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
 		@assert length(cauchy) == nstressstrain(self.mr)
 		# Finger deformation tensor
-		mul!(self._b, Fn1, Transpose(Fn1))
+		b = Fn1*Fn1';
 		J = det(Fn1); # Jacobian of the deformation gradient
-		@. self._sigma = (self._mu/J) * (self._b - self._I3) + (self._lambda *log(J)/J) * self._I3;
-		stressttov!(mr, cauchy, self._sigma)
+		sigma = (self._mu/J) .* (b .- _I3) .+ (self._lambda *log(J)/J) .* _I3;
+		stressttov!(mr, cauchy, sigma)
 		if quantity == :nothing
 		    #Nothing to be copied to the output array
 		elseif quantity == :cauchy || quantity == :Cauchy
@@ -88,28 +82,22 @@ function MatDeforNeohookean(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FF
 		end
 		return output
     end
-    lambda = E * nu / (1 + nu) / (1 - 2*(nu));
-    mu = E / 2. / (1+nu);
-    mI = diagm(0=>[1, 1, 1, 0.5, 0.5, 0.5]);
-    m1m1 = _m1*_m1';
-    I3 = [1.0 0 0; 0 1.0 0; 0 0 1.0]
-    b = [0.0 0 0; 0 0.0 0; 0 0 0.0]
-    sigma = [0.0 0 0; 0 0.0 0; 0 0 0.0]
-    return MatDeforNeohookean(mr, mass_density, E, nu, lambda, mu,
-		              tangentmoduli3d!, update3d!, 
-		              deepcopy(mI), deepcopy(m1m1), deepcopy(I3), deepcopy(b), deepcopy(sigma))
+    _lambda = E * nu / (1 + nu) / (1 - 2*(nu));
+    _mu = E / 2. / (1+nu);
+    return MatDeforNeohookeanNaive(mr, mass_density, E, nu, _lambda, _mu,
+		              tangentmoduli3d!, update3d!)
 end
 
 """
-        MatDeforNeohookean(mr::Type{MR}, E::FFlt, nu::FFlt) where {MR}
+        MatDeforNeohookeanNaive(mr::Type{MR}, E::FFlt, nu::FFlt) where {MR}
 
     Create neohookean isotropic elastic material.
 
     The mass density is the default value.
 """
-function MatDeforNeohookean(mr::Type{MR}, E::FFlt, nu::FFlt) where {MR}
+function MatDeforNeohookeanNaive(mr::Type{MR}, E::FFlt, nu::FFlt) where {MR}
     mass_density = 1.0
-    return MatDeforNeohookean(mr, mass_density, E, nu)
+    return MatDeforNeohookeanNaive(mr, mass_density, E, nu)
 end
 
 """
@@ -117,7 +105,7 @@ end
 
 Estimate sound speed in the undeformed state.
 """
-function estimatesoundspeed(self::M)  where {M<:MatDeforNeohookean}
+function estimatesoundspeed(self::M)  where {M<:MatDeforNeohookeanNaive}
     return sqrt((self._lambda + 2 * self._mu) / self.mass_density)
 end
 

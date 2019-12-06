@@ -5,6 +5,7 @@ using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforLinear: FEMMDeforLinear, lumpedmass
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
+using FinEtoolsDeforNonlinear.MatDeforNeohookeanNaiveModule: MatDeforNeohookeanNaive
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness, geostiffness, nzebcloads, restoringforce, estimatestablestep
 using LinearAlgebra: norm

@@ -2,6 +2,16 @@ using Pkg
 Pkg.activate(".")  
 Pkg.instantiate()
 using FinEtoolsDeforNonlinear
+using Profile
+
+include("C:\\Users\\PK\\Documents\\work\\FinEtoolsDeforNonlinear.jl\\examples\\dynamics\\transient\\3-d\\cantilever_dyn_examples.jl");                                  
+
+@time cantilever_dyn_examples.neohookean_h8()   
+Profile.clear_malloc_data() 
+@time cantilever_dyn_examples.neohookean_h8()   
+
+exit()
+
 # include("test/playground.jl")
 # Pkg.test()
 
