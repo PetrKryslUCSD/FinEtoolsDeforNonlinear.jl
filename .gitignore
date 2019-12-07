@@ -8,4 +8,5 @@
 *.CSV
 *.sublime-workspace
 *~
+*.mem
 docs/build/
