@@ -26,3 +26,10 @@ If we create a deep copy of the material, these buffers should be thread safe. N
     # dimensions for isotropic materials.  This needs to be generalized at
     # some point.
     speed_of_sound = sqrt(self.material.property.E / (1 - 2*self.material.property.nu) / self.material.property.rho);
+
+- Handling of local material coordinate systems: needs to be checked  in the base FEMM.
+
+- How to avoid reallocation of buffers for the base FEMM? The abstract type cannot store any data
+and the needed buffers are reallocated on each call.
+
+
