@@ -2,15 +2,15 @@ using Pkg
 Pkg.activate(".")  
 Pkg.instantiate()
 using FinEtoolsDeforNonlinear
-using Profile
+# using Profile
 
 include(".\\examples\\dynamics\\transient\\3-d\\cantilever_dyn_examples.jl");                                  
 
 @time cantilever_dyn_examples.neohookean_h8()   
-Profile.clear_malloc_data() 
-@time cantilever_dyn_examples.neohookean_h8()   
+# Profile.clear_malloc_data() 
+# @time cantilever_dyn_examples.neohookean_h8()   
 
-exit()
+# exit()
 
 # include("test/playground.jl")
 # Pkg.test()
