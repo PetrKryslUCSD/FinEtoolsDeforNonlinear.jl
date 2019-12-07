@@ -31,6 +31,7 @@ function neohookean_h8()
     tend = 0.25e-3
 
     fens, fes = H8block(L, W, H, 16, 9, 9)
+    @info count(fens), count(fes)
     geom = NodalField(fens.xyz)
     u = NodalField(zeros(size(fens.xyz,1),3))
 
@@ -124,13 +125,12 @@ function neohookean_h8()
         increment_observer(step, tn, un1);
     end
 
-    # @show Ux / phun("mm"), ts
-
     pl = lineplot(ts, Ux / phun("mm"), canvas = DotCanvas)
     display(pl)
 
     vtkexportmesh("neohookean_h8.vtk", fens, fes; vectors = [("u", un1.values)])
-    true
+   @info "$step steps done"
+  true
 end # function neohookean_h8
 
 function allrun()
