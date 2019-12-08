@@ -64,6 +64,14 @@ struct _Buffers
 	sg::FFltMat 
 end
 
+struct _Bfuns
+	npts::FInt 
+	Ns::Array{Array{Float64,2},2}
+	gradNparams::Array{Array{Float64,2},2}
+	w::FFltMat  
+	pc::FFltMat 
+end
+
 function _makebuffers(initialized, ndn, nne, sdim, mdim, nstrs)
     elmatdim = ndn*nne;             # dimension of the element matrix
     # Prepare _buffers
@@ -122,6 +130,7 @@ mutable struct FEMMDeforNonlinearExpl{MR<:AbstractDeforModelRed,  S<:AbstractFES
 	material::M # material object
 	statev::Vector{Vector{FFltVec}} # vector of state vectors, one for each element, and then for each integration point
 	_buffers::_Buffers
+	_bfuns::_Bfuns
 end
 
 
@@ -140,7 +149,8 @@ function FEMMDeforNonlinearExpl(mr::Type{MR}, integdomain::IntegDomain{S, F}, ma
     for i in 1:count(integdomain.fes)
         push!(statev, [newstate(material) for j in 1:npts])
     end
-    return FEMMDeforNonlinearExpl(mr, integdomain, CSys(manifdim(integdomain.fes)), material, statev, _makebuffers(false, 1, 1, 1, 1, 1))
+    npts, Ns, gradNparams, w, pc = integrationdata(integdomain);
+    return FEMMDeforNonlinearExpl(mr, integdomain, CSys(manifdim(integdomain.fes)), material, statev, _makebuffers(false, 1, 1, 1, 1, 1), _Bfuns(npts, Ns, gradNparams, w, pc))
 end
 
 """
@@ -156,7 +166,8 @@ function FEMMDeforNonlinearExpl(mr::Type{MR}, integdomain::IntegDomain{S, F}, mc
     for i in 1:count(integdomain.fes)
         push!(statev, [newstate(material) for j in 1:npts])
     end
-    return FEMMDeforNonlinearExpl(mr, integdomain, mcsys, material, statev, _makebuffers(false, 1, 1, 1, 1, 1))
+    npts, Ns, gradNparams, w, pc = integrationdata(integdomain);
+    return FEMMDeforNonlinearExpl(mr, integdomain, mcsys, material, statev, _makebuffers(false, 1, 1, 1, 1, 1), _Bfuns(npts, Ns, gradNparams, w, pc))
 end
 
 function _buff1(self::FEMMDeforNonlinearExpl, geom::NodalField, u::NodalField)
@@ -215,7 +226,7 @@ particular, the material state gets updated.
 """
 function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt, savestate = false) where {A<:AbstractSysvecAssembler, T<:Number}
     fes = self.integdomain.fes
-    npts,  Ns,  gradNparams,  w,  pc = integrationdata(self.integdomain);
+    npts,  Ns,  gradNparams,  w,  pc = self._bfuns.npts,  self._bfuns.Ns,  self._bfuns.gradNparams,  self._bfuns.w,  self._bfuns.pc;
     _makebuffers!(self, geom, un1)
     dofnums, loc, J, csmatTJ, gradXN, gradxN, gradxmN = _buff1(self, geom, un1)
     B, elvec, pu = _buff4(self, geom, un1)
