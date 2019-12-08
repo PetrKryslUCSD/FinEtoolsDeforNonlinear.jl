@@ -260,7 +260,7 @@ function nzebcloads(self::AbstractFEMMDeforNonlinear, geom::NodalField{FFlt}, un
 end
 
 """
-    restoringforce(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt) where {A<:AbstractSysvecAssembler, T<:Number}
+    restoringforce(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt, savestate = false) where {A<:AbstractSysvecAssembler, T<:Number}
 
 Compute the restoring force vector.
 
@@ -274,6 +274,7 @@ particular, the material state gets updated.
 - `un` = displacement field at time `tn`,
 - `tn` = time in step `n`
 - `dtn` = increment of time
+- `savestate` = bool flag: should we modify the material states (`savestate = true`)? Otherwise work with a copy of the material state.
 """
 function restoringforce(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt, savestate = false) where {A<:AbstractSysvecAssembler, T<:Number}
     fes = self.integdomain.fes
