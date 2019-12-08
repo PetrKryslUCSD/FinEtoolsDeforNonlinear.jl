@@ -393,7 +393,13 @@ function estimatestablestep(self::AbstractFEMMDeforNonlinear, geom::NodalField{F
     # dimensions for isotropic materials.  This needs to be generalized at
     # some point.
     speed_of_sound = estimatesoundspeed(self.material);
-    dsq = (X1,X2) -> sum((X2-X1).^2);
+    function dsq(X, i, j)
+    	d = (X[i, 1] - X[j, 1])^2
+    	for m in 2:size(X, 2)
+    		d += (X[i, m] - X[j, m])^2
+    	end
+    	return d
+    end
     stabldt = Inf;
     for i = 1:count(fes) # Loop over elements
         gathervalues_asmat!(geom, X, fes.conn[i]);
@@ -402,7 +408,7 @@ function estimatestablestep(self::AbstractFEMMDeforNonlinear, geom::NodalField{F
             mind = Inf;
             for  i in 1:length(fes.conn[i])
                 for  j in (i+1):length(fes.conn[i])
-                    mind = min(mind, dsq(X[i,:],X[j,:]));
+                    mind = min(mind, dsq(X, i, j));
                 end
             end
             mind = sqrt(mind);
