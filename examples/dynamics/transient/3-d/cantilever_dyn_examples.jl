@@ -6,9 +6,10 @@ using FinEtoolsDeforLinear: FEMMDeforLinear, lumpedmass
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanNaiveModule: MatDeforNeohookeanNaive
-using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
-using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness, geostiffness, nzebcloads, restoringforce, estimatestablestep
 
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness, geostiffness, nzebcloads, restoringforce, estimatestablestep
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearExplModule: FEMMDeforNonlinearExpl
 using FinEtoolsDeforNonlinear.AssemblyModule: SysvecAssemblerOpt
 using LinearAlgebra: norm
 using Statistics: mean
@@ -54,7 +55,7 @@ function neohookean_h8()
 
     movel1  = selectnode(fens; box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
 
-    femm = FEMMDeforNonlinear(mr, IntegDomain(fes, GaussRule(3, 2)), m)
+    femm = FEMMDeforNonlinearExpl(mr, IntegDomain(fes, GaussRule(3, 2)), m)
     femm = associategeometry!(femm, geom)
 
     Ux = FFlt[]; ts = FFlt[]

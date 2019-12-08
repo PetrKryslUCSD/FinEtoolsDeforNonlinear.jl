@@ -19,6 +19,7 @@ include("MatDeforStVKModule.jl")
 include("AssemblyModule.jl")
 include("FEMMDeforNonlinearBaseModule.jl")
 include("FEMMDeforNonlinearModule.jl")
+include("FEMMDeforNonlinearExplModule.jl")
 
 include("AlgoDeforNonlinearModule.jl")
 
