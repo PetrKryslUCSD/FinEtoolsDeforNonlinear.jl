@@ -129,13 +129,15 @@ function neohookean_h8()
     end
 
 	timing = time() - timing
-    println("$step steps done in $(timing) seconds")
-    println("$(timing / count(fes) / step * 1.0e6) microseconds per element in one time step")
-
+    
     pl = lineplot(ts, Ux / phun("mm"), canvas = DotCanvas)
     display(pl)
 
     vtkexportmesh("neohookean_h8.vtk", fens, fes; vectors = [("u", un1.values)])
+
+    println("$step steps done in $(timing) seconds")
+    mus = timing / count(fes) / step * 1.0e6
+    println("$(round(100 * mus) / 100) microseconds per element in one time step")
 
     true
 end # function neohookean_h8
