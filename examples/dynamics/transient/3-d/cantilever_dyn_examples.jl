@@ -19,6 +19,8 @@ using Interpolations
 using UnicodePlots
 
 function neohookean_h8()
+	timing = time()
+
     mr = DeforModelRed3D
     E, nu = 7.0*phun("MPa"), 0.3
     mass_density = 1000.0*phun("kg/m^3")
@@ -61,7 +63,7 @@ function neohookean_h8()
     Ux = FFlt[]; ts = FFlt[]
     function increment_observer(step, t, un1)
         if rem(step, 100) == 0
-            println("step = $(step)")
+            println("$(step) steps")
             push!(Ux, mean(un1.values[movel1,3]));
             push!(ts, t);
         end
@@ -71,7 +73,7 @@ function neohookean_h8()
     un = deepcopy(u)
     vn1 = deepcopy(u)
 
-    @show stabldt = estimatestablestep(femm, geom);
+    stabldt = estimatestablestep(femm, geom);
     M = lumpedmass(femm, geom, un1)
     invMv = [1.0 / M[idx, idx] for idx in 1:size(M, 1)] 
 
@@ -126,12 +128,16 @@ function neohookean_h8()
         increment_observer(step, tn, un1);
     end
 
+	timing = time() - timing
+    println("$step steps done in $(timing) seconds")
+    println("$(timing / count(fes) / step * 1.0e6) microseconds per element in one time step")
+
     pl = lineplot(ts, Ux / phun("mm"), canvas = DotCanvas)
     display(pl)
 
     vtkexportmesh("neohookean_h8.vtk", fens, fes; vectors = [("u", un1.values)])
-   @info "$step steps done"
-  true
+
+    true
 end # function neohookean_h8
 
 function allrun()
