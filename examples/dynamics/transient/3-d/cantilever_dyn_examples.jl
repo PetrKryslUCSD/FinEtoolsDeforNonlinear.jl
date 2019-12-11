@@ -142,7 +142,7 @@ function neohookean_h8()
     true
 end # function neohookean_h8
 
-# For threaded execution we will need the per-thread buffer:
+# For threaded execution we will need a per-thread buffer:
 # Each thread has its own machine, its own assembler, and its own assembled
 # vector. This is to avoid memory contention.
 struct ThreadBuffer
@@ -255,7 +255,7 @@ function neohookean_h8_thr()
         for th in 1:length(threadbuffs)
         	push!(tasks, Threads.@spawn begin 
         		fill!(threadbuffs[th].F, 0.0) # zero out the force vector for this thread
-        		# now add the restoring for from the subset of the mesh handled by this thread
+        		# now add the restoring force from the subset of the mesh handled by this thread
         		threadbuffs[th].F  .+= restoringforce(threadbuffs[th].femm, threadbuffs[th].assembler, geom, un1, un, tn, dtn, true)
         	end);
         end
