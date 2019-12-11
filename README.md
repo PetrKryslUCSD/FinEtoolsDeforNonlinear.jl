@@ -11,11 +11,12 @@
 [`FinEtools`](https://github.com/PetrKryslUCSD/FinEtools.jl.git) is a package
 for basic operations on finite element meshes. `FinEtoolsDeforNonlinear` is a
 package using `FinEtools` to solve nonlinear stress analysis problems. At the
-moment,  statics and hyper elastic materials are included.
+moment,  statics and dynamics with hyperelastic materials are included.
 
 ## News
 
-- 10/12/2019: Corrected a design flaw in the matrix utilities module.
+- 12/13/2019: Instrumented an example of transient (explicit) dynamics so that runs in parallel on multiple threads.
+- 12/09/2019: Added an example of transient (explicit) dynamics.
 
 [Past news](oldnews.md)
 
