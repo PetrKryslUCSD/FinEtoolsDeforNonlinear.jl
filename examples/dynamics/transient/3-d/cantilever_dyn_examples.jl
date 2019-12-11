@@ -196,7 +196,7 @@ function neohookean_h8_thr()
     threadbuffs = ThreadBuffer[];
     for th in 1:nth
     	# This thread will work on a subset of the mesh.
-    	meshrange = th < nth ? chunk*(th-1)+1:chunk*(th)+1-1 : chunk*(th-1)+1:count(fes)
+    	meshrange = th < nth ? (chunk*(th-1)+1:chunk*(th)+1-1) : (chunk*(th-1)+1:count(fes))
     	feschnk = subset(fes, collect(meshrange))
     	femm = FEMMDeforNonlinearExpl(mr, IntegDomain(feschnk, GaussRule(3, 2)), m)
     	femm = associategeometry!(femm, geom)
