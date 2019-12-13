@@ -21,19 +21,19 @@ using UnicodePlots
 function neohookean_h8()
 	timing = time()
 
-    mr = DeforModelRed3D
-    E, nu = 7.0*phun("MPa"), 0.3
-    mass_density = 1000.0*phun("kg/m^3")
-    m = MatDeforNeohookean(mr, mass_density, E, nu)
-    L= 6/2*phun("mm");
-    H = 2/2*phun("mm");
-    W = 2/2*phun("mm");
-    tmag = 0.2*phun("MPa");# Magnitude of the traction
-    tolerance = W / 1000
-    traction_vector = [0.0, 0.0, -tmag]
-    tend = 0.25e-3
+	mr = DeforModelRed3D
+	E, nu = 7.0*phun("MPa"), 0.3
+	mass_density = 1000.0*phun("kg/m^3")
+	m = MatDeforNeohookean(mr, mass_density, E, nu)
+	L= 6/2*phun("mm");
+	H = 2/2*phun("mm");
+	W = 2/2*phun("mm");
+	tmag = 0.1*phun("MPa");# Magnitude of the traction
+	tolerance = W / 1000
+	traction_vector = [0.0, 0.0, -tmag]
+	tend = 0.025e-3
 
-    fens, fes = H8block(L, W, H, 16, 9, 9)
+	fens, fes = H8block(L, W, H, 40, 20, 20)
     @info count(fens), count(fes)
     geom = NodalField(fens.xyz)
     u = NodalField(zeros(size(fens.xyz,1),3))
@@ -62,7 +62,7 @@ function neohookean_h8()
 
     Ux = FFlt[]; ts = FFlt[]
     function increment_observer(step, t, un1)
-        if rem(step, 100) == 0
+        if step == 1 || rem(step, 10) == 0
             println("$(step) steps")
             push!(Ux, mean(un1.values[movel1,3]));
             push!(ts, t);
@@ -146,9 +146,8 @@ end # function neohookean_h8
 # Each thread has its own machine, its own assembler, and its own assembled
 # vector. This is to avoid memory contention.
 struct ThreadBuffer
-	femm # finite element machine
+	femm # finite element machine, with private copy of finite elements and the material
 	assembler # assembler: each thread needs to have its own in order not to write into one the same
-	F::Vector{Float64} # assembled  vector of global forces for this thread
 end
 
 function neohookean_h8_thr()
@@ -164,7 +163,7 @@ function neohookean_h8_thr()
     tmag = 0.1*phun("MPa");# Magnitude of the traction
     tolerance = W / 1000
     traction_vector = [0.0, 0.0, -tmag]
-    tend = 0.0125e-3
+    tend = 0.025e-3
 
     fens, fes = H8block(L, W, H, 40, 20, 20)
     @info "Mesh of $(count(fens)) nodes, $(count(fes)) elements"
@@ -191,18 +190,19 @@ function neohookean_h8_thr()
     movel1  = selectnode(fens; box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
 
     # Now we prepare  the assembly for threaded execution.
-    nth = Base.Threads.nthreads()
+    @show nth = Base.Threads.nthreads()
     chunk = Int(floor(count(fes) / nth))
     threadbuffs = ThreadBuffer[];
     for th in 1:nth
     	# This thread will work on a subset of the mesh.
     	meshrange = th < nth ? (chunk*(th-1)+1:chunk*(th)+1-1) : (chunk*(th-1)+1:count(fes))
-    	feschnk = subset(fes, collect(meshrange))
-    	femm = FEMMDeforNonlinearExpl(mr, IntegDomain(feschnk, GaussRule(3, 2)), m)
+    	feschnk = deepcopy(subset(fes, collect(meshrange)))
+    	material = deepcopy(m)
+    	femm = FEMMDeforNonlinearExpl(mr, IntegDomain(feschnk, GaussRule(3, 2)), material)
     	femm = associategeometry!(femm, geom)
     	# It will use its own assembler in order to avoid memory contention.
     	assembler = SysvecAssemblerOpt(fill(0.0, u.nfreedofs), u.nfreedofs)
-    	push!(threadbuffs, ThreadBuffer(femm, assembler, fill(0.0, u.nfreedofs)));
+    	push!(threadbuffs, ThreadBuffer(femm, assembler));
     end
 
     Ux = FFlt[]; ts = FFlt[]
@@ -254,15 +254,15 @@ function neohookean_h8_thr()
         tasks = [];
         for th in 1:length(threadbuffs)
         	push!(tasks, Threads.@spawn begin 
-        		fill!(threadbuffs[th].F, 0.0) # zero out the force vector for this thread
+        		fill!(threadbuffs[th].assembler.F_buffer, 0.0)
         		# now add the restoring force from the subset of the mesh handled by this thread
-        		threadbuffs[th].F  .+= restoringforce(threadbuffs[th].femm, threadbuffs[th].assembler, geom, un1, un, tn, dtn, true)
+        		restoringforce(threadbuffs[th].femm, threadbuffs[th].assembler, geom, un1, un, tn, dtn, true)
         	end);
         end
         # Wait for the threads to finish, and then add the force from the thread to the global force vector
         for th in 1:length(tasks)
         	Threads.wait(tasks[th]);
-        	Fn .+= threadbuffs[th].F
+        	Fn .+= threadbuffs[th].assembler.F_buffer
         end
         # Compute the new acceleration.
         An1 .= invMv .* Fn;
