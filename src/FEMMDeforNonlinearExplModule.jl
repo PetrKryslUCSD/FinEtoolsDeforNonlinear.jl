@@ -225,6 +225,7 @@ particular, the material state gets updated.
 - `savestate` = bool flag: should we modify the material states (`savestate = true`)? Otherwise work with a copy of the material state.
 """
 function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt, savestate = false) where {A<:AbstractSysvecAssembler, T<:Number}
+    timmy = time()
     fes = self.integdomain.fes
     npts,  Ns,  gradNparams,  w,  pc = self._bfuns.npts,  self._bfuns.Ns,  self._bfuns.gradNparams,  self._bfuns.w,  self._bfuns.pc;
     _makebuffers!(self, geom, un1)
@@ -237,6 +238,7 @@ function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, geom::NodalF
         statev = deepcopy(self.statev) # work with copies of material state
     end
     startassembly!(assembler, un1.nfreedofs);
+    println("Processing $(count(fes)) elements")
     for i = 1:count(fes) # Loop over elements
         gathervalues_asmat!(geom, X, fes.conn[i]);
         gathervalues_asmat!(un, Un, fes.conn[i]);
@@ -263,6 +265,7 @@ function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, geom::NodalF
         gatherdofnums!(un1, dofnums, fes.conn[i]); # retrieve degrees of freedom
         assemble!(assembler, elvec, dofnums); # assemble symmetric matrix
     end # Loop over elements
+    println("restoringforce: $(time() - timmy)")
     return makevector!(assembler);
 end
 
