@@ -3,14 +3,18 @@ Pkg.activate(".")
 Pkg.instantiate()
 using FinEtoolsDeforNonlinear
 using Profile
+using LinearAlgebra
 
 include(".\\examples\\dynamics\\transient\\3-d\\weird_timing_examples.jl");                                  
 
 # Serial  execution
 weird_timing_examples.neohookean_h8()   
 # Parallel execution
-for NTHREADS in [1 2 4 8]
+LinearAlgebra.BLAS.set_num_threads(1) 
+@show ccall((:openblas_get_num_threads64_, Base.libblas_name), Cint, ())
+for NTHREADS in [1 8]
 	weird_timing_examples.neohookean_h8_thr(NTHREADS)   
+	weird_timing_examples.neohookean_h8_thr_2(NTHREADS)  
 end
 
 

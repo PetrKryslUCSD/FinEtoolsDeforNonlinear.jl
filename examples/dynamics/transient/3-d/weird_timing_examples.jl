@@ -6,7 +6,6 @@ using FinEtoolsDeforLinear: FEMMDeforLinear, lumpedmass
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanNaiveModule: MatDeforNeohookeanNaive
-
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness, geostiffness, nzebcloads, restoringforce, estimatestablestep
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearExplModule: FEMMDeforNonlinearExpl
@@ -27,8 +26,10 @@ W = 2/2*phun("mm");
 tmag = 0.1*phun("MPa");# Magnitude of the traction
 tolerance = W / 1000
 traction_vector = [0.0, 0.0, -tmag]
+# A million-element mesh
 nL, nW, nH = 160, 80, 80
 tend = 0.00075e-3
+# Much smaller mesh
 nL, nW, nH = 40, 20, 20
 tend = 0.075e-3
 
@@ -259,7 +260,8 @@ function neohookean_h8_thr(NTHREADS)
         	end);
         	
         end
-        println("Farm out work: $(time() - tim1)")# Wait for the threads to finish, and then add the force from the thread to the global force vector
+        println("Farm out work: $(time() - tim1)")
+        # Wait for the threads to finish, and then add the force from the thread to the global force vector
         tim1  = time()
         for th in 1:length(tasks)
         	Threads.wait(tasks[th]);
@@ -405,7 +407,8 @@ function neohookean_h8_thr_2(NTHREADS)
 	        println("Thread $(Threads.threadid()): $(time() - tim2)")
 	    end
 	    end
-        println("Farm out work: $(time() - tim1)")# Wait for the threads to finish, and then add the force from the thread to the global force vector
+        println("Farm out work: $(time() - tim1)")
+        # Wait for the threads to finish, and then add the force from the thread to the global force vector
         tim1  = time()
         for th in 1:length(threadbuffs)
         	Fn .+= threadbuffs[th].assembler.F_buffer

@@ -6,9 +6,13 @@ using Profile
 
 include(".\\examples\\dynamics\\transient\\3-d\\cantilever_dyn_examples.jl");                                  
 
-cantilever_dyn_examples.neohookean_h8()   
-# Profile.clear_malloc_data() 
-cantilever_dyn_examples.neohookean_h8_thr()   
+# Serial  execution
+weird_timing_examples.neohookean_h8()   
+# Parallel execution
+for NTHREADS in [1 2 4 8]
+	weird_timing_examples.neohookean_h8_thr(NTHREADS)   
+end
+
 
 # exit()
 
