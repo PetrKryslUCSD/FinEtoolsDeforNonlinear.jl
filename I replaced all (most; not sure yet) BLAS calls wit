@@ -1,0 +1,8 @@
+I replaced all (most; not sure yet) BLAS calls with hand coded Julia. The results are encouraging, but also confusing the issues further, at least in some respect.
+
+1. The whole thing runs faster, even for serial execution. 7.3 vs. 19 seconds for the serial case.
+2. The speed up is now reasonable:  efficiency is 0.82 for 2 threads, 0.62 for 4 threads, and 0.51 for 8 threads. Previously the speed up was an unmitigated disaster (efficiency of 0.57, 0.3, 0.17).
+3. So clearly there must be some interaction between the BLAS threads and the Julia threads.
+4. It was not possible to turn off this interaction by setting the number of blas threads to 1.
+
+The last item is clearly a cause for concern. People won't be able to efficiently utilize Julia threads unless the interaction with lower-level libraries can be resolved.

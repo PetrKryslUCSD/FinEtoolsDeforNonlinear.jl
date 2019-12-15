@@ -4,11 +4,9 @@ using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, F
 import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed3D, DeforModelRed2DStrain, DeforModelRed2DStress, DeforModelRed2DAxisymm, DeforModelRed1D, nstressstrain, nthermstrain
 import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor, stressvtot!, stressttov!
 import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, estimatesoundspeed
-import LinearAlgebra: Transpose, Diagonal, mul!
-At_mul_B!(C, A, B) = mul!(C, Transpose(A), B)
-A_mul_B!(C, A, B) = mul!(C, A, B)
-import LinearAlgebra: eigen, eigvals, norm, cholesky, cross, dot, log, diagm, det
-
+import LinearAlgebra: Transpose, Diagonal
+import LinearAlgebra: eigen, eigvals, log, diagm
+import FinEtools.MatrixUtilityModule: mulCAB!, mulCAtB!, mulCABt!, detC
 
 """
 	MatDeforNeohookean{MR<:AbstractDeforModelRed, MTAN<:Function, MUPD<:Function} <: AbstractMatDeforNonlinear
@@ -58,15 +56,15 @@ Create triaxial neohookean hyperelastic material.
 function MatDeforNeohookean(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FFlt, nu::FFlt)
     _m1 = vec(FFlt[1 1 1 0 0 0]) ;
     function tangentmoduli3d!(self::MatDeforNeohookean, D::FFltMat, statev::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat, label::FInt)
-		J = det(Fn1);
+		J = detC(Val(3), Fn1);
 		copyto!(D, (self._lambda / J) * self._m1m1 + 2 * (self._mu - self._lambda*log(J))/J * self._mI);
 		return D
     end
     function update3d!(self::MatDeforNeohookean, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
 		@assert length(cauchy) == nstressstrain(self.mr)
 		# Finger deformation tensor
-		mul!(self._b, Fn1, Transpose(Fn1))
-		J = det(Fn1); # Jacobian of the deformation gradient
+		mulCABt!(self._b, Fn1, Fn1)
+		J = detC(Val(3), Fn1); # Jacobian of the deformation gradient
 		@. self._sigma = (self._mu/J) * (self._b - self._I3) + (self._lambda *log(J)/J) * self._I3;
 		stressttov!(mr, cauchy, self._sigma)
 		if quantity == :nothing

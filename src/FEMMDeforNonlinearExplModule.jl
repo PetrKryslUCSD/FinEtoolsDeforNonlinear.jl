@@ -20,15 +20,12 @@ import FinEtoolsDeforLinear.MatDeforModule: rotstressvec!
 import FinEtools.MatModule: massdensity
 import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, tangentmoduli!, update!, newstate
 import FinEtools.SurfaceNormalModule: SurfaceNormal, updatenormal!
-import FinEtools.MatrixUtilityModule: add_btdb_ut_only!, complete_lt!, add_btv!, locjac!, add_nnt_ut_only!, add_gkgt_ut_only!, add_btsigma!
-import LinearAlgebra: Transpose, mul!
-At_mul_B!(C, A, B) = mul!(C, Transpose(A), B)
-A_mul_B!(C, A, B) = mul!(C, A, B)
-import LinearAlgebra: norm, dot, det
+import FinEtools.MatrixUtilityModule: add_btdb_ut_only!, complete_lt!, add_btv!, locjac!, add_nnt_ut_only!, add_gkgt_ut_only!, add_btsigma!, jac!
 import ..FEMMDeforNonlinearBaseModule: restoringforce
+import FinEtools.MatrixUtilityModule: mulCAB!, mulCAtB!, mulCABt!, detC
 
 rotF!(Fr, F, RmTF, Rm) = begin
-    At_mul_B!(RmTF, Rm, F); A_mul_B!(Fr, RmTF, Rm)
+mulCAtB!(Val(3), RmTF, Rm, F); mulCAB!(Val(3), Fr, RmTF, Rm)
 end
 
 struct _Buffers
@@ -225,7 +222,6 @@ particular, the material state gets updated.
 - `savestate` = bool flag: should we modify the material states (`savestate = true`)? Otherwise work with a copy of the material state.
 """
 function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt, savestate = false) where {A<:AbstractSysvecAssembler, T<:Number}
-    timmy = time()
     fes = self.integdomain.fes
     npts,  Ns,  gradNparams,  w,  pc = self._bfuns.npts,  self._bfuns.Ns,  self._bfuns.gradNparams,  self._bfuns.w,  self._bfuns.pc;
     _makebuffers!(self, geom, un1)
@@ -238,7 +234,6 @@ function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, geom::NodalF
         statev = deepcopy(self.statev) # work with copies of material state
     end
     startassembly!(assembler, un1.nfreedofs);
-    println("Processing $(count(fes)) elements")
     for i = 1:count(fes) # Loop over elements
         gathervalues_asmat!(geom, X, fes.conn[i]);
         gathervalues_asmat!(un, Un, fes.conn[i]);
@@ -250,22 +245,20 @@ function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, geom::NodalF
             locjac!(loc, J, X, Ns[j], gradNparams[j])
             Jac = Jacobianvolume(self.integdomain, J, loc, fes.conn[i], Ns[j]);
             updatecsmat!(self.mcsys, loc, J, fes.label[i]); Rm = self.mcsys.csmat
-            # At_mul_B!(csmatTJ, self.mcsys.csmat, J); # local Jacobian matrix
             gradN!(fes, gradXN, gradNparams[j], J); # wrt global c.s.
-            At_mul_B!(Fn, xn, gradXN) # Previous deformation gradient
-            At_mul_B!(Fn1, xn1, gradXN) # Current deformation gradient
+            jac!(Fn, xn, gradXN) # Previous deformation gradient
+            jac!(Fn1, xn1, gradXN) 
             rotF!(Fnm, Fn, RmTF, Rm) # wrt local c.s.
             rotF!(Fn1m, Fn1, RmTF, Rm) # wrt local c.s.
             update!(self.material, statev[i][j], cauchy, output, Fn1m, Fnm, tn, dtn, loc, fes.label[i])
             gradN!(fes, gradxN, gradXN, Fn1); # wrt current c.s.
-            A_mul_B!(gradxmN, gradxN, Rm) # wrt material c.s.
+            mulCAB!(gradxmN, gradxN, Rm) # wrt material c.s.
             Blmat!(self.mr, B, Ns[j], gradxmN, loc, Rm); # local strain-global disp
-            add_btsigma!(elvec, B, - Jac * w[j] * det(Fn1), cauchy)
+            add_btsigma!(elvec, B, - Jac * w[j] * detC(Val(3), Fn1), cauchy)
         end # Loop over quadrature points
         gatherdofnums!(un1, dofnums, fes.conn[i]); # retrieve degrees of freedom
         assemble!(assembler, elvec, dofnums); # assemble symmetric matrix
     end # Loop over elements
-    println("restoringforce: $(time() - timmy)")
     return makevector!(assembler);
 end
 

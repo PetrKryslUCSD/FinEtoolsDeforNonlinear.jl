@@ -19,21 +19,21 @@ using Interpolations
 using UnicodePlots
 
 function neohookean_h8()
-	timing = time()
+		timing = time()
 
-	mr = DeforModelRed3D
-	E, nu = 7.0*phun("MPa"), 0.3
-	mass_density = 1000.0*phun("kg/m^3")
-	m = MatDeforNeohookean(mr, mass_density, E, nu)
-	L= 6/2*phun("mm");
-	H = 2/2*phun("mm");
-	W = 2/2*phun("mm");
-	tmag = 0.1*phun("MPa");# Magnitude of the traction
-	tolerance = W / 1000
-	traction_vector = [0.0, 0.0, -tmag]
-	tend = 0.025e-3
+	    mr = DeforModelRed3D
+	    E, nu = 7.0*phun("MPa"), 0.3
+	    mass_density = 1000.0*phun("kg/m^3")
+	    m = MatDeforNeohookean(mr, mass_density, E, nu)
+	    L= 6/2*phun("mm");
+	    H = 2/2*phun("mm");
+	    W = 2/2*phun("mm");
+	    tmag = 0.1*phun("MPa");# Magnitude of the traction
+	    tolerance = W / 1000
+	    traction_vector = [0.0, 0.0, -tmag]
+	    tend = 0.00075e-3
 
-	fens, fes = H8block(L, W, H, 40, 20, 20)
+	    fens, fes = H8block(L, W, H, 160, 80, 80)
     @info count(fens), count(fes)
     geom = NodalField(fens.xyz)
     u = NodalField(zeros(size(fens.xyz,1),3))
@@ -105,7 +105,9 @@ function neohookean_h8()
         @. Un1 = Un + dtn*Vn + ((dtn^2)/2)*An;# displacement update
         scattersysvec!(un1, Un1);
         # Add the restoring forces, starting from the time-independent load.
+        tim = time()
         Fn .+= restoringforce(femm, assembler, geom, un1, un, tn, dtn, true)
+        println("$(time() - tim)")
         # Compute the new acceleration.
         An1 .= invMv .* Fn;
         # An1 .= M \ Fn;
@@ -163,9 +165,9 @@ function neohookean_h8_thr()
     tmag = 0.1*phun("MPa");# Magnitude of the traction
     tolerance = W / 1000
     traction_vector = [0.0, 0.0, -tmag]
-    tend = 0.025e-3
+    tend = 0.00075e-3
 
-    fens, fes = H8block(L, W, H, 40, 20, 20)
+    fens, fes = H8block(L, W, H, 80, 40, 40)
     @info "Mesh of $(count(fens)) nodes, $(count(fes)) elements"
     geom = NodalField(fens.xyz)
     u = NodalField(zeros(size(fens.xyz,1),3))
@@ -190,7 +192,7 @@ function neohookean_h8_thr()
     movel1  = selectnode(fens; box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
 
     # Now we prepare  the assembly for threaded execution.
-    @show nth = Base.Threads.nthreads()
+    @show nth = 1 #Base.Threads.nthreads()
     chunk = Int(floor(count(fes) / nth))
     threadbuffs = ThreadBuffer[];
     for th in 1:nth
@@ -251,19 +253,27 @@ function neohookean_h8_thr()
         @. Un1 = Un + dtn*Vn + ((dtn^2)/2)*An;# displacement update
         scattersysvec!(un1, Un1);
         # Add the restoring forces, starting from the time-independent load.
+        tim = time()
+        tim1  = time()
         tasks = [];
         for th in 1:length(threadbuffs)
         	push!(tasks, Threads.@spawn begin 
+        		tim2  = time()
         		fill!(threadbuffs[th].assembler.F_buffer, 0.0)
         		# now add the restoring force from the subset of the mesh handled by this thread
         		restoringforce(threadbuffs[th].femm, threadbuffs[th].assembler, geom, un1, un, tn, dtn, true)
+        		println("Thread $(Threads.threadid()): $(time() - tim2)")
         	end);
+        	
         end
-        # Wait for the threads to finish, and then add the force from the thread to the global force vector
+        println("Farm out work: $(time() - tim1)")# Wait for the threads to finish, and then add the force from the thread to the global force vector
+        tim1  = time()
         for th in 1:length(tasks)
         	Threads.wait(tasks[th]);
         	Fn .+= threadbuffs[th].assembler.F_buffer
         end
+        println("Collect results: $(time() - tim1)")
+        println("Total: $(time() - tim)")
         # Compute the new acceleration.
         An1 .= invMv .* Fn;
         # An1 .= M \ Fn;

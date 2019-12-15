@@ -1,0 +1,584 @@
+
+julia> include("threaded_test.jl")
+Activating environment at `C:\Users\PetrKrysl\Documents\work\tmp\FinEtoolsDeforNonlinear.jl-with_blas\Project.toml`
+WARNING: replacing module weird_timing_examples.
+[ Info: (1056321, 1024000)
+Processing 1024000 elements
+restoringforce: 17.624000072479248
+18.18499994277954
+1 steps
+Processing 1024000 elements
+restoringforce: 17.30900001525879
+17.311999797821045
+Processing 1024000 elements
+restoringforce: 16.77400016784668
+16.77400016784668
+Processing 1024000 elements
+restoringforce: 16.796000003814697
+16.799000024795532
+Processing 1024000 elements
+restoringforce: 17.144999980926514
+17.1489999294281
+Processing 1024000 elements
+restoringforce: 17.26099991798401
+17.266000032424927
+Processing 1024000 elements
+restoringforce: 16.973000049591064
+16.97699999809265
+Processing 1024000 elements
+restoringforce: 16.763999938964844
+16.763999938964844
+(ts, Ux / phun("mm")) = ([1.0301575072754194e-7], [0.0])
+8 steps done in 230.66799998283386 seconds
+28.16 microseconds per element in one time step
+ccall((:openblas_get_num_threads64_, Base.libblas_name), Cint, ()) = 1
+[ Info: Mesh of 1056321 nodes, 1024000 elements
+nth = NTHREADS = 1
+Farm out work: 0.0009999275207519531
+Processing 1024000 elements
+restoringforce: 16.969000101089478
+Thread 8: 16.99400019645691
+Collect results: 19.76199984550476
+Total: 19.76799988746643
+1 steps
+Farm out work: 0.0
+Processing 1024000 elements
+restoringforce: 19.490000009536743
+Thread 3: 19.490999937057495
+Collect results: 19.49399995803833
+Total: 19.494999885559082
+Farm out work: 0.0
+Processing 1024000 elements
+restoringforce: 19.032000064849854
+Thread 4: 19.03500008583069
+Collect results: 19.038000106811523
+Total: 19.039000034332275
+Farm out work: 0.0
+Processing 1024000 elements
+restoringforce: 19.323999881744385
+Thread 4: 19.325999975204468
+Collect results: 19.329999923706055
+Total: 19.331000089645386
+Farm out work: 0.0009999275207519531
+Processing 1024000 elements
+restoringforce: 19.015000104904175
+Thread 4: 19.01799988746643
+Collect results: 19.022000074386597
+Total: 19.02300000190735
+Farm out work: 0.0
+Processing 1024000 elements
+restoringforce: 19.052000045776367
+Thread 4: 19.05399990081787
+Collect results: 19.057999849319458
+Total: 19.057999849319458
+Processing 1024000 elements
+Farm out work: 0.003999948501586914
+restoringforce: 18.487000226974487
+Thread 4: 18.48900008201599
+Collect results: 18.48900008201599
+Total: 18.493000030517578
+Farm out work: 0.0
+Processing 1024000 elements
+restoringforce: 19.417999982833862
+Thread 4: 19.420000076293945
+Collect results: 19.418999910354614
+Total: 19.420000076293945
+8 steps done in 293.40899991989136 seconds
+35.82 microseconds per element in one time step
+[ Info: Mesh of 1056321 nodes, 1024000 elements
+nth = NTHREADS = 1
+Processing 1024000 elements
+restoringforce: 18.092000007629395
+Thread 1: 18.10199999809265
+Farm out work: 18.483999967575073
+Collect results: 0.016000032424926758
+Total: 18.5
+1 steps
+Processing 1024000 elements
+restoringforce: 15.585000038146973
+Thread 1: 15.600000143051147
+Farm out work: 15.600000143051147
+Collect results: 0.003000020980834961
+Total: 15.604000091552734
+Processing 1024000 elements
+restoringforce: 15.3989999294281
+Thread 1: 15.401000022888184
+Farm out work: 15.40499997138977
+Collect results: 0.0
+Total: 15.427000045776367
+Processing 1024000 elements
+restoringforce: 15.347000122070312
+Thread 1: 15.347000122070312
+Farm out work: 15.347000122070312
+Collect results: 0.0
+Total: 15.347000122070312
+Processing 1024000 elements
+restoringforce: 15.305000066757202
+Thread 1: 15.305000066757202
+Farm out work: 15.305000066757202
+Collect results: 0.003000020980834961
+Total: 15.308000087738037
+Processing 1024000 elements
+restoringforce: 15.479000091552734
+Thread 1: 15.48200011253357
+Farm out work: 15.486000061035156
+Collect results: 0.003000020980834961
+Total: 15.490000009536743
+Processing 1024000 elements
+restoringforce: 15.311000108718872
+Thread 1: 15.313999891281128
+Farm out work: 15.313999891281128
+Collect results: 0.003000020980834961
+Total: 15.317999839782715
+Processing 1024000 elements
+restoringforce: 15.353999853134155
+Thread 1: 15.355999946594238
+Farm out work: 15.358000040054321
+Collect results: 0.0029997825622558594
+Total: 15.360999822616577
+(ts, Ux / phun("mm")) = ([1.0301575072754194e-7], [0.0])
+8 steps done in 265.17899990081787 seconds
+32.37 microseconds per element in one time step
+[ Info: Mesh of 1056321 nodes, 1024000 elements
+nth = NTHREADS = 8
+Farm out work: 0.0
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 19.7810001373291
+restoringforce: 20.094000101089478
+restoringforce: 20.25
+Thread 5: 20.592999935150146
+Thread 2: 20.592999935150146
+Thread 6: 20.592999935150146
+restoringforce: 20.546000003814697
+Thread 1: 20.57800006866455
+restoringforce: 20.625
+Thread 8: 20.639999866485596
+restoringforce: 20.625
+Thread 4: 20.639999866485596
+restoringforce: 20.6560001373291
+Thread 3: 20.671000003814697
+restoringforce: 20.687000036239624
+Thread 7: 20.70199990272522
+Collect results: 20.65499997138977
+Total: 20.70199990272522
+1 steps
+Farm out work: 0.0
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 15.212999820709229
+Thread 1: 15.228999853134155
+restoringforce: 15.259999990463257
+Thread 2: 15.276000022888184
+restoringforce: 15.33899998664856
+Thread 7: 15.355000019073486
+restoringforce: 15.355000019073486
+Thread 8: 15.371000051498413
+restoringforce: 15.369999885559082
+Thread 6: 15.385999917984009
+restoringforce: 15.369999885559082
+Thread 5: 15.385999917984009
+restoringforce: 15.416999816894531
+Thread 3: 15.432999849319458
+restoringforce: 17.623000144958496
+Thread 4: 17.65400004386902
+Collect results: 17.623000144958496
+Total: 17.65400004386902
+Farm out work: 0.0
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 17.542999982833862
+restoringforce: 17.58999991416931
+restoringforce: 17.620999813079834
+restoringforce: 17.783999919891357
+Thread 5: 17.80299997329712
+Thread 2: 17.80299997329712
+restoringforce: 17.787999868392944
+restoringforce: 17.715999841690063
+Thread 6: 17.80299997329712
+Thread 3: 17.80299997329712
+Thread 7: 17.80299997329712
+Thread 8: 17.80299997329712
+restoringforce: 17.772000074386597
+restoringforce: 17.787999868392944
+Thread 1: 17.819000005722046
+Thread 4: 17.819000005722046
+Collect results: 17.7739999294281
+Total: 17.819000005722046
+Farm out work: 0.0
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 17.40400004386902
+restoringforce: 17.575999975204468
+restoringforce: 17.622999906539917
+Thread 2: 17.66200017929077
+Thread 5: 17.66200017929077
+Thread 6: 17.66200017929077
+restoringforce: 17.63100004196167
+Thread 1: 17.66200017929077
+restoringforce: 17.694000005722046
+Thread 4: 17.70900011062622
+restoringforce: 17.694000005722046
+Thread 8: 17.70900011062622
+restoringforce: 17.72499990463257
+Thread 7: 17.740000009536743
+restoringforce: 17.72499990463257
+Thread 3: 17.740000009536743
+Collect results: 17.723999977111816
+Total: 17.755000114440918
+Processing 128000 elements
+Farm out work: 0.0
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 14.483999967575073
+Thread 3: 14.498999834060669
+restoringforce: 14.625999927520752
+Thread 2: 14.625999927520752
+Processing 128000 elements
+restoringforce: 14.742999792098999
+Thread 8: 14.742999792098999
+restoringforce: 14.769999980926514
+Thread 4: 14.78499984741211
+restoringforce: 14.775000095367432
+Thread 7: 14.789999961853027
+restoringforce: 14.785000085830688
+Thread 6: 14.799999952316284
+restoringforce: 14.844000101089478
+Thread 5: 14.859999895095825
+restoringforce: 17.055999994277954
+Thread 2: 17.07099986076355
+Collect results: 17.043999910354614
+Total: 17.074999809265137
+Farm out work: 0.002000093460083008
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 17.376999855041504
+restoringforce: 17.528000116348267
+restoringforce: 17.56599998474121
+Thread 6: 17.602999925613403
+Thread 5: 17.602999925613403
+Thread 2: 17.605000019073486
+restoringforce: 17.588000059127808
+Thread 1: 17.60599994659424
+restoringforce: 17.680000066757202
+Thread 8: 17.694000005722046
+restoringforce: 17.688999891281128
+Thread 4: 17.70199990272522
+restoringforce: 17.700999975204468
+Thread 7: 17.71499991416931
+restoringforce: 17.703999996185303
+Thread 3: 17.717000007629395
+Collect results: 17.71499991416931
+Total: 17.743000030517578
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Farm out work: 0.003999948501586914
+Processing 128000 elements
+restoringforce: 14.42799997329712
+Thread 1: 14.445000171661377
+restoringforce: 14.64299988746643
+Thread 7: 14.654000043869019
+restoringforce: 14.661999940872192
+Thread 3: 14.674999952316284
+restoringforce: 14.690999984741211
+Thread 6: 14.702000141143799
+restoringforce: 14.698000192642212
+Thread 5: 14.708000183105469
+restoringforce: 14.72100019454956
+Thread 4: 14.722000122070312
+Processing 128000 elements
+restoringforce: 14.75
+Thread 2: 14.764000177383423
+restoringforce: 17.00100016593933
+Thread 4: 17.014000177383423
+Collect results: 17.003999948501587
+Total: 17.032999992370605
+Farm out work: 0.0
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 17.394999980926514
+restoringforce: 17.47699999809265
+restoringforce: 17.558000087738037
+Thread 2: 17.620999813079834
+Thread 5: 17.620999813079834
+Thread 6: 17.620999813079834
+restoringforce: 17.605000019073486
+Thread 1: 17.620999813079834
+restoringforce: 17.683000087738037
+Thread 7: 17.698999881744385
+restoringforce: 17.699000120162964
+Thread 3: 17.71499991416931
+restoringforce: 17.71399998664856
+Thread 8: 17.729999780654907
+restoringforce: 17.71399998664856
+Thread 4: 17.729999780654907
+Collect results: 17.697999954223633
+Total: 17.729999780654907
+8 steps done in 290.10599994659424 seconds
+35.41 microseconds per element in one time step
+[ Info: Mesh of 1056321 nodes, 1024000 elements
+nth = NTHREADS = 8
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 20.282000064849854
+Thread 5: 20.302000045776367
+restoringforce: 20.424000024795532
+Thread 6: 20.442000150680542
+restoringforce: 20.485999822616577
+Thread 2: 20.50499987602234
+restoringforce: 20.59599995613098
+Thread 3: 20.61400008201599
+restoringforce: 20.610999822616577
+Thread 1: 20.62999987602234
+restoringforce: 20.735999822616577
+Thread 4: 20.75499987602234
+restoringforce: 20.735999822616577
+Thread 7: 20.75499987602234
+restoringforce: 20.751999855041504
+Thread 8: 20.770999908447266
+Farm out work: 20.7739999294281
+Collect results: 0.031000137329101562
+Total: 20.805999994277954
+1 steps
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 17.437000036239624
+Thread 5: 17.450999975204468
+restoringforce: 17.55399990081787
+Thread 6: 17.567999839782715
+restoringforce: 17.581000089645386
+Thread 2: 17.59500002861023
+restoringforce: 17.685999870300293
+Thread 1: 17.699999809265137
+restoringforce: 17.751999855041504
+Thread 8: 17.764999866485596
+restoringforce: 17.76900005340576
+Thread 3: 17.782999992370605
+restoringforce: 17.77300000190735
+Thread 7: 17.78600001335144
+restoringforce: 17.776999950408936
+Thread 4: 17.79099988937378
+Farm out work: 17.79099988937378
+Collect results: 0.026999950408935547
+Total: 17.817999839782715
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 17.539000034332275
+Thread 2: 17.55299997329712
+restoringforce: 17.598000049591064
+Thread 5: 17.611000061035156
+restoringforce: 17.718000173568726
+Thread 6: 17.73200011253357
+restoringforce: 17.717999935150146
+Thread 1: 17.73300004005432
+restoringforce: 17.777000188827515
+Thread 4: 17.794000148773193
+restoringforce: 17.820000171661377
+Thread 8: 17.83400011062622
+restoringforce: 17.82100009918213
+Thread 3: 17.835000038146973
+restoringforce: 17.844000101089478
+Thread 7: 17.85800004005432
+Farm out work: 17.85800004005432
+Collect results: 0.026999950408935547
+Total: 17.884999990463257
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 17.552000045776367
+Thread 2: 17.56500005722046
+restoringforce: 17.582000017166138
+Thread 5: 17.594000101089478
+restoringforce: 17.585000038146973
+Thread 6: 17.598000049591064
+restoringforce: 17.700000047683716
+Thread 1: 17.717000007629395
+restoringforce: 17.920000076293945
+Thread 7: 17.933000087738037
+restoringforce: 17.92899990081787
+Thread 8: 17.94099998474121
+restoringforce: 17.930000066757202
+Thread 4: 17.943000078201294
+restoringforce: 17.939000129699707
+Thread 3: 17.9520001411438
+Farm out work: 17.9520001411438
+Collect results: 0.026999950408935547
+Total: 17.979000091552734
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 17.532000064849854
+Thread 2: 17.545000076293945
+restoringforce: 17.610000133514404
+Thread 5: 17.624000072479248
+restoringforce: 17.736000061035156
+Thread 6: 17.749000072479248
+restoringforce: 17.7979998588562
+Thread 3: 17.810999870300293
+restoringforce: 17.78499984741211
+Thread 1: 17.810999870300293
+restoringforce: 17.812999963760376
+Thread 7: 17.82699990272522
+restoringforce: 17.84000015258789
+Thread 4: 17.85800004005432
+restoringforce: 17.84500002861023
+Thread 8: 17.85800004005432
+Farm out work: 17.85800004005432
+Collect results: 0.03099989891052246
+Total: 17.888999938964844
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 2.2619998455047607
+Processing 128000 elements
+Processing 128000 elements
+Thread 8: 4.421000003814697
+restoringforce: 4.4019999504089355
+Thread 1: 4.421000003814697
+restoringforce: 16.292999982833862
+Thread 6: 16.308000087738037
+restoringforce: 16.359999895095825
+Thread 7: 16.375
+restoringforce: 16.396999835968018
+Thread 3: 16.411999940872192
+restoringforce: 16.449999809265137
+Thread 2: 16.46499991416931
+restoringforce: 16.495999813079834
+Thread 4: 16.51099991798401
+restoringforce: 16.5239999294281
+Thread 5: 16.539000034332275
+Farm out work: 16.539999961853027
+Collect results: 0.02500009536743164
+Total: 16.56599998474121
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 17.495999813079834
+Thread 5: 17.51099991798401
+restoringforce: 17.528000116348267
+Thread 6: 17.54200005531311
+restoringforce: 17.54100012779236
+Thread 1: 17.558000087738037
+restoringforce: 17.65400004386902
+Thread 2: 17.66700005531311
+restoringforce: 17.653000116348267
+Thread 8: 17.66700005531311
+restoringforce: 17.763000011444092
+Thread 4: 17.780999898910522
+restoringforce: 17.796000003814697
+Thread 7: 17.811000108718872
+restoringforce: 17.807999849319458
+Thread 3: 17.822999954223633
+Farm out work: 17.822999954223633
+Collect results: 0.029000043869018555
+Total: 17.852999925613403
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+Processing 128000 elements
+restoringforce: 17.496000051498413
+Thread 5: 17.509000062942505
+restoringforce: 17.51799988746643
+Thread 6: 17.532000064849854
+restoringforce: 17.526999950408936
+Thread 2: 17.537999868392944
+restoringforce: 17.61299991607666
+Thread 1: 17.625999927520752
+restoringforce: 17.677000045776367
+Thread 8: 17.69000005722046
+restoringforce: 17.740000009536743
+Thread 7: 17.753000020980835
+restoringforce: 17.754000186920166
+Thread 4: 17.76900005340576
+restoringforce: 17.764999866485596
+Thread 3: 17.777999877929688
+Farm out work: 17.77899980545044
+Collect results: 0.024000167846679688
+Total: 17.80299997329712
+(ts, Ux / phun("mm")) = ([1.0301575072754194e-7], [0.0])
+8 steps done in 290.67400002479553 seconds
+35.48 microseconds per element in one time step

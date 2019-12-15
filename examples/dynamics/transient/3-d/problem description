@@ -45,8 +45,9 @@ git clone https://github.com/PetrKryslUCSD/FinEtoolsDeforNonlinear.jl
 ```
 followed by
 ```
-cd FinEtoolsDeforNonlinear
+cd FinEtoolsDeforNonlinear.jl
 export JULIA_NUM_THREADS=8
+export OPENBLAS_NUM_THREADS=1
 julia
 ```
 and

@@ -30,8 +30,8 @@ traction_vector = [0.0, 0.0, -tmag]
 nL, nW, nH = 160, 80, 80
 tend = 0.00075e-3
 # Much smaller mesh
-nL, nW, nH = 40, 20, 20
-tend = 0.075e-3
+# nL, nW, nH = 80, 40, 40
+# tend = 0.005e-3
 
 function neohookean_h8()
 	timing = time()
@@ -203,7 +203,7 @@ function neohookean_h8_thr(NTHREADS)
 
     Ux = FFlt[]; ts = FFlt[]
     function increment_observer(step, t, un1)
-        if step == 1 || rem(step, 10) == 0
+        if step == 1 || rem(step, 3) == 0
             println("$(step) steps")
             push!(Ux, mean(un1.values[movel1,3]));
             push!(ts, t);
@@ -234,6 +234,9 @@ function neohookean_h8_thr(NTHREADS)
     Un1 = deepcopy(Un);
     Vn1 = deepcopy(Vn);
     An1 = deepcopy(An);
+    timfo = []
+    timco = []
+    timto = []
     step = 0;
     while tn < tend
         step = step + 1      # Step counter
@@ -252,23 +255,20 @@ function neohookean_h8_thr(NTHREADS)
         tasks = [];
         for th in 1:length(threadbuffs)
         	push!(tasks, Threads.@spawn begin 
-        		tim2  = time()
         		fill!(threadbuffs[th].assembler.F_buffer, 0.0)
         		# now add the restoring force from the subset of the mesh handled by this thread
         		restoringforce(threadbuffs[th].femm, threadbuffs[th].assembler, geom, un1, un, tn, dtn, true)
-        		println("Thread $(Threads.threadid()): $(time() - tim2)")
         	end);
-        	
         end
-        println("Farm out work: $(time() - tim1)")
+        push!(timfo, time() - tim1)
         # Wait for the threads to finish, and then add the force from the thread to the global force vector
         tim1  = time()
         for th in 1:length(tasks)
         	Threads.wait(tasks[th]);
         	Fn .+= threadbuffs[th].assembler.F_buffer
         end
-        println("Collect results: $(time() - tim1)")
-        println("Total: $(time() - tim)")
+        push!(timco, time() - tim1)
+        push!(timto, time() - tim)
         # Compute the new acceleration.
         An1 .= invMv .* Fn;
         # An1 .= M \ Fn;
@@ -294,6 +294,7 @@ function neohookean_h8_thr(NTHREADS)
 	timing = time() - timing
     
     ts, Ux / phun("mm")
+    @show mean(timto), nth
     # pl = lineplot(ts, Ux / phun("mm"), canvas = DotCanvas)
     # display(pl)
 
@@ -352,11 +353,11 @@ function neohookean_h8_thr_2(NTHREADS)
 
     Ux = FFlt[]; ts = FFlt[]
     function increment_observer(step, t, un1)
-        if step == 1 || rem(step, 10) == 0
-            println("$(step) steps")
-            push!(Ux, mean(un1.values[movel1,3]));
-            push!(ts, t);
-        end
+    	if step == 1 || rem(step, 3) == 0
+    		println("$(step) steps")
+    		push!(Ux, mean(un1.values[movel1,3]));
+    		push!(ts, t);
+    	end
     end
 
     # Fields for the current, last displacements
@@ -383,6 +384,9 @@ function neohookean_h8_thr_2(NTHREADS)
     Un1 = deepcopy(Un);
     Vn1 = deepcopy(Vn);
     An1 = deepcopy(An);
+    timfo = []
+    timco = []
+    timto = []
     step = 0;
     while tn < tend
         step = step + 1      # Step counter
@@ -400,21 +404,19 @@ function neohookean_h8_thr_2(NTHREADS)
         tim1  = time()
         Threads.@threads for th in 1:length(threadbuffs)
         begin
-	        tim2  = time()
 	        fill!(threadbuffs[th].assembler.F_buffer, 0.0)
 	        # now add the restoring force from the subset of the mesh handled by this thread
 	        restoringforce(threadbuffs[th].femm, threadbuffs[th].assembler, geom, un1, un, tn, dtn, true)
-	        println("Thread $(Threads.threadid()): $(time() - tim2)")
 	    end
 	    end
-        println("Farm out work: $(time() - tim1)")
+        push!(timfo, time() - tim1)
         # Wait for the threads to finish, and then add the force from the thread to the global force vector
         tim1  = time()
         for th in 1:length(threadbuffs)
         	Fn .+= threadbuffs[th].assembler.F_buffer
         end
-        println("Collect results: $(time() - tim1)")
-        println("Total: $(time() - tim)")
+        push!(timco, time() - tim1)
+        push!(timto, time() - tim)
         # Compute the new acceleration.
         An1 .= invMv .* Fn;
         # An1 .= M \ Fn;
@@ -440,6 +442,7 @@ function neohookean_h8_thr_2(NTHREADS)
 	timing = time() - timing
     
     @show ts, Ux / phun("mm")
+    @show mean(timto), nth
     # pl = lineplot(ts, Ux / phun("mm"), canvas = DotCanvas)
     # display(pl)
 
