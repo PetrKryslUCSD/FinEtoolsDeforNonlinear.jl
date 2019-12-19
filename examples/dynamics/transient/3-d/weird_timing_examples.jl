@@ -30,8 +30,8 @@ traction_vector = [0.0, 0.0, -tmag]
 nL, nW, nH = 160, 80, 80
 tend = 0.00075e-3
 # Much smaller mesh
-# nL, nW, nH = 80, 40, 40
-# tend = 0.005e-3
+nL, nW, nH = 80, 40, 40
+tend = 0.001e-3
 
 function neohookean_h8()
 	timing = time()
@@ -161,7 +161,7 @@ function neohookean_h8_thr(NTHREADS)
 	timing = time()
 
     m = MatDeforNeohookean(mr, mass_density, E, nu)
-    	fens, fes = H8block(L, W, H, nL, nW, nH)
+    fens, fes = H8block(L, W, H, nL, nW, nH)
     @info "Mesh of $(count(fens)) nodes, $(count(fes)) elements"
     geom = NodalField(fens.xyz)
     u = NodalField(zeros(size(fens.xyz,1),3))
