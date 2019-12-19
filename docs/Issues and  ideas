@@ -6,7 +6,7 @@ using FinEtoolsDeforNonlinear
 using DocumenterTools
 Travis.genkeys(user="PetrKryslUCSD", repo="https://github.com/PetrKryslUCSD/FinEtoolsDeforNonlinear.jl")
 
--- Make all "traction_bcs" referred to force intensity objects.
+-- Make all "traction_bcs" refer to force intensity objects.
 
 – cauchyt = Fn1*(S/det(Fn1))*Fn1'; # Cauchy stress
 This should be really coded as a special transformation. Available both for
@@ -18,7 +18,7 @@ function MatDeforNeohookean(mr::Type{DeforModelRed3D}, mass_density::FFlt, E::FF
 	_m1 = vec(FFlt[1 1 1 0 0 0]) ;
 	_m1m1 = _m1*_m1';
 	_I3 = [1.0 0 0; 0 1.0 0; 0 0 1.0]
-If we create a deep copy of the material, these buffers should be thread safe. Needs to be checked, though.
+If we create a deep copy of the material, these buffers should be thread safe. Needs to be checked, though. Status 12/19/2019: This has been solved by making these temporary buffers fields in the datatype.
 
 
 - Estimation of stable time step
@@ -32,4 +32,6 @@ If we create a deep copy of the material, these buffers should be thread safe. N
 - How to avoid reallocation of buffers for the base FEMM? The abstract type cannot store any data
 and the needed buffers are reallocated on each call.
 
+- Julia threads do not cooperate with BLAS threads. All the BLAS calls needed to be eliminated from the explicit code in order to obtain good parallel efficiency. BLAS allocates some workspace(s),
+and the library protects this with locks in a multi-threading environment. This then leads to a general slowdown of any code that uses BLAS in any form.
 
