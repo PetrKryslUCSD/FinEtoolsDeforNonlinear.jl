@@ -36,4 +36,5 @@ and the needed buffers are reallocated on each call.
 and the library protects this with locks in a multi-threading environment. This then leads to a general slowdown of any code that uses BLAS in any form.
 
 - I think some of the specialized linear-algebra code should dispatch on the model reduction type.
-Examples: detC().
+Examples: detC(). How to do it is however not quite obvious.
+The code for the model reduction type lives in the linear-deformation package, whereas the linear algebra code lives in FinEtools proper.
