@@ -35,3 +35,5 @@ and the needed buffers are reallocated on each call.
 - Julia threads do not cooperate with BLAS threads. All the BLAS calls needed to be eliminated from the explicit code in order to obtain good parallel efficiency. BLAS allocates some workspace(s),
 and the library protects this with locks in a multi-threading environment. This then leads to a general slowdown of any code that uses BLAS in any form.
 
+- I think some of the specialized linear-algebra code should dispatch on the model reduction type.
+Examples: detC().
