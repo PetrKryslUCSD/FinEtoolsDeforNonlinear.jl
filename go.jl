@@ -4,13 +4,13 @@ Pkg.instantiate()
 using FinEtoolsDeforNonlinear
 using Profile
 
-include(".\\examples\\dynamics\\transient\\3-d\\cantilever_dyn_examples.jl");                                  
+include("./examples/dynamics/transient/3-d/cantilever_dyn_examples.jl");                                  
 
 # Serial  execution
-weird_timing_examples.neohookean_h8()   
+# cantilever_dyn_examples.neohookean_h8()   
 # Parallel execution
 for NTHREADS in [1 2 4 8]
-	weird_timing_examples.neohookean_h8_thr(NTHREADS)   
+	cantilever_dyn_examples.neohookean_h8_thr(NTHREADS)   
 end
 
 
