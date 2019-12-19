@@ -116,9 +116,14 @@ function _makebuffers(initialized, ndn, nne, sdim, mdim, nstrs)
 end
 
 """
-    AbstractFEMMDeforNonlinear <: AbstractFEMMDeforLinear
+    FEMMDeforNonlinearExpl <: AbstractFEMMDeforNonlinear
 
-Abstract type of FEMM for nonlinear deformation.
+Type of FEMM for explicit-dynamics simulations of nonlinear deformation.
+
+!!! note
+Julia threads do not cooperate with BLAS threads. All the BLAS calls are
+eliminated from the implementation of this FEMM in order to obtain good parallel
+efficiency.
 """
 mutable struct FEMMDeforNonlinearExpl{MR<:AbstractDeforModelRed,  S<:AbstractFESet, F<:Function, M<:AbstractMatDeforNonlinear} <: AbstractFEMMDeforNonlinear
 	mr::Type{MR} # model reduction type
@@ -126,8 +131,8 @@ mutable struct FEMMDeforNonlinearExpl{MR<:AbstractDeforModelRed,  S<:AbstractFES
 	mcsys::CSys # updater of the material orientation matrix
 	material::M # material object
 	statev::Vector{Vector{FFltVec}} # vector of state vectors, one for each element, and then for each integration point
-	_buffers::_Buffers
-	_bfuns::_Bfuns
+	_buffers::_Buffers # workspace: pre-allocate so that the memory is handled efficiently
+	_bfuns::_Bfuns # workspace: pre-allocate so that the memory is handled efficiently
 end
 
 
@@ -210,7 +215,7 @@ end
 Compute the restoring force vector.
 
 Note: This method *UPDATES* the state of the FEMM object.  In
-particular, the material state gets updated.
+particular, the material state gets updated (refer to `savestate`).
 
 # Arguments
 - `assembler` = vector assembler,

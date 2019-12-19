@@ -17,6 +17,11 @@ Type for triaxial neohookean hyperelastic material.
 The material object is not thread safe. It holds temporary arrays.
 If the object is to be used in a multi-threaded environment, each thread must
 have its own private copy.
+
+!!! note
+Julia threads do not cooperate with BLAS threads. All the BLAS calls are
+eliminated from the implementation of this material in order to obtain good parallel
+efficiency.
 """
 struct  MatDeforNeohookean{MR<:AbstractDeforModelRed, MTAN<:Function, MUPD<:Function} <: AbstractMatDeforNonlinear
     mr::Type{MR} # model reduction type
