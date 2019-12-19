@@ -59,10 +59,12 @@ function MatDeforStVK(mr::Type{DeforModelRed3D}, mass_density::FFlt, E1::FFlt, E
 	end
 	function update3d!(self::MatDeforStVK, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
 		@assert length(cauchy) == nstressstrain(self.mr)
-		# Cauchy-Green deformation tensor
-		C = Fn1'*Fn1;
-		# Green-Lagrange strain
-		E = 1/2*(C-_I3)
+		# Note: the code below allocates. This may not be a big deal when the
+		# code gets called only a few times, but in explicit dynamics
+		# situations  this would be very expensive. The material type needs to
+		# provide these temporary arrays as buffers. 
+		C = Fn1'*Fn1;# Cauchy-Green deformation tensor
+		E = 1/2*(C-_I3)# Green-Lagrange strain
 		Egl = fill(0.0, nstressstrain(self.mr))
 		strainttov!(mr, Egl, E);
 		S = self._D * Egl;

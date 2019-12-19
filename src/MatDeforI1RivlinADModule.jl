@@ -67,6 +67,10 @@ function MatDeforI1RivlinAD(mr::Type{DeforModelRed3D}, mass_density::FFlt, c1::F
 	end
 	function update3d!(self::MatDeforI1RivlinAD, statev::FFltVec, cauchy::FFltVec, output::FFltVec, Fn1::FFltMat, Fn::FFltMat, tn::FFlt, dtn::FFlt, loc::FFltMat=zeros(3,1), label::FInt=0, quantity=:nothing)
 		@assert length(cauchy) == nstressstrain(self.mr)
+		# Note: the code below allocates. This may not be a big deal when the
+		# code gets called only a few times, but in explicit dynamics
+		# situations  this would be very expensive. The material type needs to
+		# provide these temporary arrays as buffers. 
 		C = Fn1'*Fn1;
 		Cv = fill(0.0, 6)
 		strainttov!(mr, Cv, C)
