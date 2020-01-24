@@ -15,9 +15,8 @@ moment,  statics and dynamics with hyperelastic materials are included.
 
 ## News
 
-- 12/19/2019: Fixed flawed scaling of the threaded calculation: Julia threads do not cooperate with BLAS threads. All the BLAS calls needed to be eliminated from the explicit code in order to obtain good parallel efficiency.
-- 12/13/2019: Instrumented an example of transient (explicit) dynamics so that runs in parallel on multiple threads.
-- 12/09/2019: Added an example of transient (explicit) dynamics.
+- 01/23/2020: Dependencies have been updated to work with Julia 1.3.1.
+
 
 [Past news](oldnews.md)
 
