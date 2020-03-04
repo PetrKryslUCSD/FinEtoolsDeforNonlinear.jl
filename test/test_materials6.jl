@@ -44,6 +44,7 @@ using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNonlinearModule: estimatesoundspeed
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanNaiveModule: MatDeforNeohookeanNaive
+using LinearAlgebra
 using BenchmarkTools
 using Test
 function test()
@@ -68,9 +69,11 @@ function test()
     Fn = [1.0 0 0; 0 1.0 0; 0 0 1.0]
 
     update!(m1, statev, stress, output, Fn1, Fn, tn, dtn, loc, label, quantity)
-    @show stress
+    stress1 = deepcopy(stress)
+    # @show stress
     update!(m2, statev, stress, output, Fn1, Fn, tn, dtn, loc, label, quantity)
-    @show stress
+    # @show stress
+    @test norm(stress - stress1) / norm(stress) <= 1.0e-12
     true
 end
 end
