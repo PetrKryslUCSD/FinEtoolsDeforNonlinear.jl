@@ -20,7 +20,7 @@ import FinEtoolsDeforLinear.MatDeforModule: rotstressvec!
 import FinEtools.MatModule: massdensity
 import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, tangentmoduli!, update!, newstate
 import FinEtools.SurfaceNormalModule: SurfaceNormal, updatenormal!
-import FinEtools.MatrixUtilityModule: add_btdb_ut_only!, complete_lt!, add_btv!, locjac!, add_nnt_ut_only!, add_gkgt_ut_only!, add_btsigma!, jac!
+import FinEtools.MatrixUtilityModule: add_btdb_ut_only!, complete_lt!, locjac!, add_nnt_ut_only!, add_gkgt_ut_only!, add_btsigma!, jac!
 import ..FEMMDeforNonlinearBaseModule: restoringforce
 import FinEtools.MatrixUtilityModule: mulCAB!, mulCAtB!, mulCABt!, detC
 

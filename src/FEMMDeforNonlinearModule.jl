@@ -15,7 +15,7 @@ import FinEtools.AssemblyModule: AbstractSysvecAssembler, AbstractSysmatAssemble
 import ..FEMMDeforNonlinearBaseModule: AbstractFEMMDeforNonlinear
 import FinEtools.CSysModule: CSys, updatecsmat!
 import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed2DAxisymm, nstressstrain, nthermstrain, Blmat!
-import FinEtools.MatrixUtilityModule: add_btdb_ut_only!, complete_lt!, add_btv!, locjac!, add_nnt_ut_only!
+import FinEtools.MatrixUtilityModule: add_btdb_ut_only!, complete_lt!, locjac!, add_nnt_ut_only!
 import FinEtoolsDeforLinear.MatDeforModule: rotstressvec!
 import FinEtools.MatModule: massdensity
 import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, tangentmoduli!, update!, newstate
