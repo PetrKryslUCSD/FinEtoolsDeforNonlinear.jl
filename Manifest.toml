@@ -1,10 +1,5 @@
 # This file is machine-generated - editing it directly is not advised
 
-[[ArgCheck]]
-git-tree-sha1 = "dedbbb2ddb876f899585c4ec4433265e3017215a"
-uuid = "dce04be8-c92d-5529-be00-80e4d2c0e197"
-version = "2.1.0"
-
 [[Arpack]]
 deps = ["Arpack_jll", "Libdl", "LinearAlgebra"]
 git-tree-sha1 = "2ff92b71ba1747c5fdd541f8fc87736d82f40ec9"
@@ -111,12 +106,6 @@ version = "1.0.0"
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 
-[[DefaultApplication]]
-deps = ["InteractiveUtils"]
-git-tree-sha1 = "fc2b7122761b22c87fec8bf2ea4dc4563d9f8c24"
-uuid = "3f0dd361-4fe0-5fc6-8523-80b14ec94d85"
-version = "1.0.0"
-
 [[DelimitedFiles]]
 deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
@@ -148,13 +137,13 @@ uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[FinEtools]]
 deps = ["Arpack", "DelimitedFiles", "LinearAlgebra", "LoopVectorization", "Printf", "Random", "SparseArrays", "Statistics", "StatsBase", "Test", "Unicode"]
-path = "../FinEtools.jl"
+git-tree-sha1 = "331ce009490808a0ba67c0ecc6ad7da69ecf037d"
 uuid = "91bb5406-6c9a-523d-811d-0644c4229550"
 version = "4.6.1"
 
 [[FinEtoolsDeforLinear]]
-deps = ["Arpack", "FinEtools", "LinearAlgebra", "Literate", "PGFPlotsX", "PlotlyJS", "SparseArrays", "Statistics", "StatsBase", "SymRCM", "Test"]
-git-tree-sha1 = "73e775da25150ed727ec18a75692b23ad783bb5e"
+deps = ["Arpack", "FinEtools", "LinearAlgebra", "PlotlyJS", "SparseArrays", "Statistics", "StatsBase", "SymRCM", "Test"]
+git-tree-sha1 = "654383b7693879eb05a73c1c7314aeb1726de787"
 repo-rev = "master"
 repo-url = "https://github.com/PetrKryslUCSD/FinEtoolsDeforLinear.jl.git"
 uuid = "e9187c00-8bdd-11e9-1e70-7ba8303116a2"
@@ -245,12 +234,6 @@ uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 deps = ["Libdl"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
-[[Literate]]
-deps = ["Base64", "JSON", "REPL"]
-git-tree-sha1 = "0ee3b052b944e1a84b6eb0ca15ce3899718df599"
-uuid = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
-version = "2.6.0"
-
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
@@ -334,18 +317,6 @@ version = "0.5.3+3"
 git-tree-sha1 = "293b70ac1780f9584c89268a6e2a560d938a7065"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 version = "1.3.0"
-
-[[PGFPlotsX]]
-deps = ["ArgCheck", "DataStructures", "Dates", "DefaultApplication", "DocStringExtensions", "MacroTools", "Parameters", "Requires"]
-git-tree-sha1 = "96fb16779688e4fd943e3625a6789e978186dfef"
-uuid = "8314cec4-20b6-5062-9cdb-752b83310925"
-version = "1.2.9"
-
-[[Parameters]]
-deps = ["OrderedCollections", "UnPack"]
-git-tree-sha1 = "38b2e970043613c187bd56a995fe2e551821eb4a"
-uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
-version = "0.12.1"
 
 [[Parsers]]
 deps = ["Dates", "Test"]
