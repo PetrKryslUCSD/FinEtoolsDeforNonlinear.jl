@@ -94,7 +94,7 @@ version = "4.7.0"
 
 [[FinEtoolsDeforLinear]]
 deps = ["Arpack", "FinEtools", "LinearAlgebra", "SparseArrays", "Statistics", "StatsBase", "SymRCM", "Test"]
-git-tree-sha1 = "73510807d09692643975c52928dac7756804fc41"
+git-tree-sha1 = "2d7b8261de565a39e96ec369b0a1bfd6d38d5dc6"
 repo-rev = "master"
 repo-url = "https://github.com/PetrKryslUCSD/FinEtoolsDeforLinear.jl.git"
 uuid = "e9187c00-8bdd-11e9-1e70-7ba8303116a2"
