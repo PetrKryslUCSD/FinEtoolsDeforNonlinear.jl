@@ -20,7 +20,7 @@ UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 [compat]
 Arpack = "^0.4"
 FinEtools = "^4.7"
-BenchmarkTools = "0.5.0"                                        
+BenchmarkTools = "^0.5"                                        
 FinEtoolsDeforLinear = "^0.4"
 ForwardDiff = "^0.10"
 Interpolations = "^0.13"
