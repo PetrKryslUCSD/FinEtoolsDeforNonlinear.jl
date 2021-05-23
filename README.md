@@ -11,6 +11,7 @@ moment,  statics and dynamics with hyperelastic materials are included.
 
 ## News
 
+- 05/23/2021: Update for Julia 1.6.
 - 01/23/2020: Dependencies have been updated to work with Julia 1.3.1.
 
 
