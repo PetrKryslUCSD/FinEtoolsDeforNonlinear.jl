@@ -1,7 +1,7 @@
 name = "FinEtoolsDeforNonlinear"
 uuid = "c9fbf690-8ea2-11e9-1d56-e5e266ebe695"
 authors = ["Petr Krysl <pkrysl@ucsd.edu>"]
-version = "0.4.1"
+version = "1.0.0"
 
 [deps]
 Arpack = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
