@@ -2,7 +2,7 @@ module cantilever_dyn_examples
 
 using FinEtools
 using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
-using FinEtoolsDeforLinear: FEMMDeforLinear, lumpedmass
+using FinEtoolsDeforLinear: FEMMDeforLinear, mass
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanNaiveModule: MatDeforNeohookeanNaive
@@ -78,7 +78,7 @@ function neohookean_h8()
     vn1 = deepcopy(u)
 
     stabldt = estimatestablestep(femm, geom);
-    M = lumpedmass(femm, geom, un1)
+    M = mass(femm, SysmatAssemblerSparseHRZLumpingSymm(zero(Float64)), geom, un1)
     invMv = [1.0 / M[idx, idx] for idx in 1:size(M, 1)] 
 
     dtn = 0.8 * stabldt
@@ -216,7 +216,7 @@ function neohookean_h8_thr(NTHREADS)
     # Assemble the mass matrix for the entire mesh
     femm = FEMMDeforNonlinearExpl(mr, IntegDomain(fes, GaussRule(3, 2)), m)
     stabldt = estimatestablestep(femm, geom);
-    M = lumpedmass(femm, geom, un1)
+    M = mass(femm, SysmatAssemblerSparseHRZLumpingSymm(zero(Float64)), geom, un1)
     invMv = [1.0 / M[idx, idx] for idx in 1:size(M, 1)] 
     femm = nothing
 
@@ -352,7 +352,7 @@ function neohookean_h8_thr_2(NTHREADS)
     # Assemble the mass matrix for the entire mesh
     femm = FEMMDeforNonlinearExpl(mr, IntegDomain(fes, GaussRule(3, 2)), m)
     stabldt = estimatestablestep(femm, geom);
-    M = lumpedmass(femm, geom, un1)
+    M = mass(femm, SysmatAssemblerSparseHRZLumpingSymm(zero(Float64)), geom, un1)
     invMv = [1.0 / M[idx, idx] for idx in 1:size(M, 1)] 
     femm = nothing
 
