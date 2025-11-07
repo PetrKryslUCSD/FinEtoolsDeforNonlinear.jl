@@ -1,8 +1,5 @@
-using Pkg
-Pkg.activate(".")  
-Pkg.instantiate()
-using FinEtoolsDeforNonlinear
-using Profile
+# run as
+# julia --project=.. -t 8 go.jl
 
 include("./examples/dynamics/transient/3-d/cantilever_dyn_examples.jl");                                  
 
