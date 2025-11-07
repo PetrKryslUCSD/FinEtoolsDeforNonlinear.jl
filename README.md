@@ -11,11 +11,10 @@ moment,  statics and dynamics with hyperelastic materials are included.
 
 ## News
 
-- 05/23/2021: Update for Julia 1.6.
-- 01/23/2020: Dependencies have been updated to work with Julia 1.3.1.
+- 11/07/2025: Update for Julia 1.11.
 
 
-[Past news](oldnews.md)
+[Past news](#past-news)
 
 ## How to test the package
 
@@ -108,8 +107,10 @@ There are a number of examples covering statics and dynamics. The examples may
 be executed as described in the  [conceptual guide to
 `FinEtools`](https://petrkryslucsd.github.io/FinEtools.jl/latest).
 
-# Past news
+## <a name="past-news"></a>Past news
 
+- 05/23/2021: Update for Julia 1.6.
+- 01/23/2020: Dependencies have been updated to work with Julia 1.3.1.
 - 12/19/2019: Fixed flawed scaling of the threaded calculation: Julia threads do not cooperate with BLAS threads. All the BLAS calls needed to be eliminated from the explicit code in order to obtain good parallel efficiency.
 - 12/13/2019: Instrumented an example of transient (explicit) dynamics so that runs in parallel on multiple threads.
 - 12/09/2019: Added an example of transient (explicit) dynamics.
