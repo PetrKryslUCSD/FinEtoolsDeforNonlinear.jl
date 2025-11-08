@@ -1,7 +1,7 @@
 module MatDeforNonlinearModule
 
 using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, FIntMat, FMat, FVec, FDataDict
-import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed
+import FinEtools.DeforModelRedModule: AbstractDeforModelRed
 import FinEtoolsDeforLinear.MatDeforModule: AbstractMatDefor
 import LinearAlgebra:  det
 

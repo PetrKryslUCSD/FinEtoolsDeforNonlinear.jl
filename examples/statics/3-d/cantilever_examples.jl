@@ -1,7 +1,7 @@
 module cantilever_examples
 
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforLinear: FEMMDeforLinear
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean

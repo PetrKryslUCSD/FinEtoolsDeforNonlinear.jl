@@ -66,7 +66,7 @@ function test()
         du.values[:] = 0.0
 
         # Initialize the load vector
-        F = fill(0.0, un1.nfreedofsyou);
+        F = fill(0.0, nfreedofs(un1)you);
 
 
     # If any boundary conditions are inhomogeneous, calculate  the force
@@ -79,7 +79,7 @@ function test()
         # Provided we got converged results  in the last step, we already
         # have a usable stiffness matrix.
         if (isempty(K)) # we don't have a stiffness matrix
-            K=  sparse(un1.nfreedofs,un1.nfreedofs);
+            K=  sparse(nfreedofs(un1),nfreedofs(un1));
             for i=1:length(model_data.region)
                 K = K + stiffness(model_data.region{i}.femm, model_data.region{i}.MA, geom, un, unm1, dlambda);
                 K = K + stiffness_geo(model_data.region{i}.femm, model_data.region{i}.MA, geom, un, unm1, dlambda);
@@ -97,7 +97,7 @@ function test()
         F =0*F;
 
         # Construct the system stiffness matrix.
-        K=  sparse(un1.nfreedofs,un1.nfreedofs);
+        K=  sparse(nfreedofs(un1),nfreedofs(un1));
         for i=1:length(model_data.region)
             K = K + stiffness(model_data.region{i}.femm, model_data.region{i}.MA, geom, un1, un, dlambda);
             K = K + stiffness_geo(model_data.region{i}.femm, model_data.region{i}.MA, geom, un1, un, dlambda);
@@ -146,7 +146,7 @@ function test()
         FL = lambda * F;
 
         # The restoring  force vector
-        FR =zeros(un1.nfreedofs,1);
+        FR =zeros(nfreedofs(un1),1);
         for i=1:length(model_data.region)
             FR = FR + restoring_force(model_data.region{i}.femm, sysvec_assembler, geom, un1, un, dlambda);
         end
@@ -163,7 +163,7 @@ function test()
         if (line_search)
             R0 = dot(F,dusol);
             for  linesrch   =1:1 # How many  searches should we do?
-                FR =zeros(un1.nfreedofs,1);
+                FR =zeros(nfreedofs(un1),1);
                 for i=1:length(model_data.region)
                     FR = FR + restoring_force(model_data.region{i}.femm, sysvec_assembler, geom, un1+eta*du, un, dlambda);
                 end

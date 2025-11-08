@@ -1,7 +1,7 @@
 module weird_timing_examples
 
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforLinear: FEMMDeforLinear, mass
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean

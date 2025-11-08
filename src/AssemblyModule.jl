@@ -44,7 +44,7 @@ the first call to the method assemble.
 function startassembly!(self::SysvecAssemblerOpt{T},  ndofs_row::FInt) where {T<:Number}
 	if ndofs_row != self.ndofs
 		self.ndofs = ndofs_row
-		self.F_buffer = zeros(T,self.ndofs);
+		self.F_buffer = zeros(T, self.ndofs);
 	end
 	fill!(self.F_buffer, zero(T))
 	return self

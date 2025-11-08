@@ -10,12 +10,12 @@ using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, F
 import FinEtools.FENodeSetModule: FENodeSet
 import FinEtools.FESetModule: AbstractFESet, gradN!, nodesperelem, manifdim
 import FinEtools.IntegDomainModule: IntegDomain, integrationdata, Jacobianvolume
-import FinEtools.FieldModule: ndofs, gatherdofnums!, gatherfixedvalues_asvec!, gathervalues_asvec!, gathervalues_asmat!
+import FinEtools.FieldModule: ndofs, gatherdofnums!, gathervalues_asvec!, gathervalues_asmat!, nalldofs
 import FinEtools.NodalFieldModule: NodalField, nnodes
 import FinEtools.AssemblyModule: AbstractSysvecAssembler, AbstractSysmatAssembler, SysmatAssemblerSparseSymm, startassembly!, assemble!, makematrix!, makevector!, SysvecAssembler
 import ..FEMMDeforNonlinearBaseModule: AbstractFEMMDeforNonlinear
 import FinEtools.CSysModule: CSys, updatecsmat!
-import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed2DAxisymm, nstressstrain, nthermstrain, Blmat!
+import FinEtools.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed2DAxisymm, nstressstrain, nthermstrain, blmat!
 import FinEtoolsDeforLinear.MatDeforModule: rotstressvec!
 import FinEtools.MatModule: massdensity
 import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, tangentmoduli!, update!, newstate
@@ -226,7 +226,9 @@ particular, the material state gets updated (refer to `savestate`).
 - `dtn` = increment of time
 - `savestate` = bool flag: should we modify the material states (`savestate = true`)? Otherwise work with a copy of the material state.
 """
-function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt, savestate = false) where {A<:AbstractSysvecAssembler, T<:Number}
+function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, 
+    geom::NodalField{GT}, un1::NodalField{T}, un::NodalField{T}, 
+    tn::PT, dtn::PT, savestate = false) where {A<:AbstractSysvecAssembler, GT<:Number, T<:Number, PT<:Number}
     fes = self.integdomain.fes
     npts,  Ns,  gradNparams,  w,  pc = self._bfuns.npts,  self._bfuns.Ns,  self._bfuns.gradNparams,  self._bfuns.w,  self._bfuns.pc;
     _makebuffers!(self, geom, un1)
@@ -238,7 +240,7 @@ function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, geom::NodalF
     if !savestate  # unless we are instructed to work with a copy
         statev = deepcopy(self.statev) # work with copies of material state
     end
-    startassembly!(assembler, un1.nfreedofs);
+    startassembly!(assembler, nalldofs(un1));
     for i = 1:count(fes) # Loop over elements
         gathervalues_asmat!(geom, X, fes.conn[i]);
         gathervalues_asmat!(un, Un, fes.conn[i]);
@@ -249,7 +251,7 @@ function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, geom::NodalF
         for j = 1:npts # Loop over quadrature points
             locjac!(loc, J, X, Ns[j], gradNparams[j])
             Jac = Jacobianvolume(self.integdomain, J, loc, fes.conn[i], Ns[j]);
-            updatecsmat!(self.mcsys, loc, J, fes.label[i]); Rm = self.mcsys.csmat
+            updatecsmat!(self.mcsys, loc, J, fes.label[i], j); Rm = self.mcsys._csmat
             gradN!(fes, gradXN, gradNparams[j], J); # wrt global c.s.
             jac!(Fn, xn, gradXN) # Previous deformation gradient
             jac!(Fn1, xn1, gradXN) 
@@ -258,7 +260,7 @@ function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, geom::NodalF
             update!(self.material, statev[i][j], cauchy, output, Fn1m, Fnm, tn, dtn, loc, fes.label[i])
             gradN!(fes, gradxN, gradXN, Fn1); # wrt current c.s.
             mulCAB!(gradxmN, gradxN, Rm) # wrt material c.s.
-            Blmat!(self.mr, B, Ns[j], gradxmN, loc, Rm); # local strain-global disp
+            blmat!(self.mr, B, Ns[j], gradxmN, loc, Rm); # local strain-global disp
             add_btsigma!(elvec, B, - Jac * w[j] * detC(Val(3), Fn1), cauchy)
         end # Loop over quadrature points
         gatherdofnums!(un1, dofnums, fes.conn[i]); # retrieve degrees of freedom
@@ -267,7 +269,9 @@ function restoringforce(self::FEMMDeforNonlinearExpl, assembler::A, geom::NodalF
     return makevector!(assembler);
 end
 
-function restoringforce(self::FEMMDeforNonlinearExpl, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt, savestate = false) where {T<:Number}
+function restoringforce(self::FEMMDeforNonlinearExpl, 
+    geom::NodalField{GT}, un1::NodalField{T}, un::NodalField{T},
+    tn::PT, dtn::PT, savestate = false) where {GT<:Number, T<:Number, PT<:Number}
     assembler = SysvecAssembler();
     return restoringforce(self, assembler, geom, un1, un, tn, dtn, savestate);
 end

@@ -1,7 +1,7 @@
 # run as
 # julia --project=.. -t 8 go.jl
 
-include("./examples/dynamics/transient/3-d/cantilever_dyn_examples.jl");                                  
+include("cantilever_dyn_examples.jl");                                  
 
 # Serial  execution
 # cantilever_dyn_examples.neohookean_h8()   

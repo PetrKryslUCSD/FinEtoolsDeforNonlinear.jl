@@ -1,6 +1,6 @@
 module tensioncompression1
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
@@ -79,7 +79,7 @@ tensioncompression1.test()
 
 module tensioncompression2
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanADModule: MatDeforNeohookeanAD
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
@@ -158,7 +158,7 @@ tensioncompression2.test()
 
 module tensioncompression3
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforStVKModule: MatDeforStVK
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
@@ -237,7 +237,7 @@ tensioncompression3.test()
 
 module tensioncompression4
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforStVKADModule: MatDeforStVKAD
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
@@ -317,7 +317,7 @@ tensioncompression4.test()
 
 module tensioncompression5
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforI1RivlinADModule: MatDeforI1RivlinAD
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
@@ -399,7 +399,7 @@ tensioncompression5.test()
 
 module m7test13bc
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using LinearAlgebra: norm
 using BenchmarkTools

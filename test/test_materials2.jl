@@ -1,7 +1,7 @@
 
 module m2test3
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using LinearAlgebra: norm
 using Test
@@ -60,7 +60,7 @@ m2test3.test()
 
 module m2test4
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using LinearAlgebra: norm
 using BenchmarkTools

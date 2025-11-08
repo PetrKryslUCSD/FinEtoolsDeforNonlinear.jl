@@ -1,6 +1,6 @@
 module m7test13a
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNonlinearModule: totalLagrangean2current!
 using LinearAlgebra: norm

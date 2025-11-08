@@ -9,12 +9,13 @@ using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, F
 import FinEtools.FENodeSetModule: FENodeSet
 import FinEtools.FESetModule: AbstractFESet, gradN!, nodesperelem, manifdim
 import FinEtools.IntegDomainModule: IntegDomain, integrationdata, Jacobianvolume
-import FinEtools.FieldModule: ndofs, gatherdofnums!, gatherfixedvalues_asvec!, gathervalues_asvec!, gathervalues_asmat!
+import FinEtools.FieldModule: ndofs, gatherdofnums!
+import FinEtools.FieldModule: gathervalues_asvec!, gathervalues_asmat!, nalldofs
 import FinEtools.NodalFieldModule: NodalField, nnodes
 import FinEtools.AssemblyModule: AbstractSysvecAssembler, AbstractSysmatAssembler, SysmatAssemblerSparseSymm, startassembly!, assemble!, makematrix!, makevector!, SysvecAssembler
 import ..FEMMDeforNonlinearBaseModule: AbstractFEMMDeforNonlinear
 import FinEtools.CSysModule: CSys, updatecsmat!
-import FinEtoolsDeforLinear.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed2DAxisymm, nstressstrain, nthermstrain, Blmat!
+import FinEtools.DeforModelRedModule: AbstractDeforModelRed, DeforModelRed2DAxisymm, nstressstrain, nthermstrain, blmat!
 import FinEtools.MatrixUtilityModule: add_btdb_ut_only!, complete_lt!, locjac!, add_nnt_ut_only!
 import FinEtoolsDeforLinear.MatDeforModule: rotstressvec!
 import FinEtools.MatModule: massdensity

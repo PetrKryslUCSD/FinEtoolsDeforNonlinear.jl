@@ -1,12 +1,12 @@
 module cantilever_dyn_examples
 
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforLinear: FEMMDeforLinear, mass
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanNaiveModule: MatDeforNeohookeanNaive
-using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness, geostiffness, nzebcloads, restoringforce, estimatestablestep
+using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness, geostiffness, restoringforce, estimatestablestep
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearExplModule: FEMMDeforNonlinearExpl
 using FinEtoolsDeforNonlinear.AssemblyModule: SysvecAssemblerOpt
@@ -31,9 +31,11 @@ traction_vector = [0.0, 0.0, -tmag]
 # tend = 0.00075e-3
 # Much smaller mesh
 nL, nW, nH = 80, 40, 40
+# nL, nW, nH = 40, 20, 20
 tend = 0.01e-3
 
 function neohookean_h8()
+    @info "neohookean_h8"
 	timing = time()
 
 	m = MatDeforNeohookean(mr, mass_density, E, nu)
@@ -51,11 +53,11 @@ function neohookean_h8()
 
     bfes = meshboundary(fes)
     el1 = selectelem(fens, bfes, box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
-    function setvector!(v, XYZ::FFltMat, tangents::FFltMat, fe_label::FInt; time::FFlt = 0.0)
+    function setvector!(v, XYZ, tangents, fe_label)
         v .= 1.0 .* traction_vector
         return v
     end
-    fi = ForceIntensity(FFlt, length(traction_vector), setvector!, 0.0);
+    fi = ForceIntensity(eltype(traction_vector), length(traction_vector), setvector!);
     eL1femm =  FEMMBase(IntegDomain(subset(bfes, el1), GaussRule(2, 2)))
     FL = distribloads(eL1femm, geom, u, fi, 2);
 
@@ -64,7 +66,7 @@ function neohookean_h8()
     femm = FEMMDeforNonlinearExpl(mr, IntegDomain(fes, GaussRule(3, 2)), m)
     femm = associategeometry!(femm, geom)
 
-    Ux = FFlt[]; ts = FFlt[]
+    Ux = Float64[]; ts = Float64[]
     function increment_observer(step, t, un1)
         if step == 1 || rem(step, 10) == 0
             println("$(step) steps")
@@ -95,7 +97,7 @@ function neohookean_h8()
     An1 = deepcopy(An);
     # Global vector assembler
     assembler = SysvecAssemblerOpt(deepcopy(Un1), length(Un1))
-    step = 0;
+    step = 0
     while tn < tend
         step = step + 1      # Step counter
         fill!(Fn, 0.0) # Zero out the load
@@ -157,6 +159,7 @@ struct ThreadBuffer
 end
 
 function neohookean_h8_thr(NTHREADS)
+    @info "neohookean_h8_thr"
 	timing = time()
 
     m = MatDeforNeohookean(mr, mass_density, E, nu)
@@ -174,18 +177,19 @@ function neohookean_h8_thr(NTHREADS)
 
     bfes = meshboundary(fes)
     el1 = selectelem(fens, bfes, box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
-    function setvector!(v, XYZ::FFltMat, tangents::FFltMat, fe_label::FInt; time::FFlt = 0.0)
+    function setvector!(v, XYZ, tangents, fe_id, qp_id)
         v .= 1.0 .* traction_vector
         return v
     end
-    fi = ForceIntensity(FFlt, length(traction_vector), setvector!, 0.0);
+    fi = ForceIntensity(eltype(traction_vector), length(traction_vector), setvector!)
     eL1femm =  FEMMBase(IntegDomain(subset(bfes, el1), GaussRule(2, 2)))
     FL = distribloads(eL1femm, geom, u, fi, 2);
-
+     
     movel1  = selectnode(fens; box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
 
     # Now we prepare  the assembly for threaded execution.
-    @show nth = NTHREADS #Base.Threads.nthreads()
+    nth = NTHREADS #Base.Threads.nthreads()
+    @info "$nth threads"
     chunk = Int(floor(count(fes) / nth))
     threadbuffs = ThreadBuffer[];
     for th in 1:nth
@@ -196,11 +200,11 @@ function neohookean_h8_thr(NTHREADS)
     	femm = FEMMDeforNonlinearExpl(mr, IntegDomain(feschnk, GaussRule(3, 2)), material)
     	femm = associategeometry!(femm, geom)
     	# It will use its own assembler in order to avoid memory contention.
-    	assembler = SysvecAssemblerOpt(fill(0.0, u.nfreedofs), u.nfreedofs)
+    	assembler = SysvecAssemblerOpt(fill(0.0, nalldofs(u)), nalldofs(u))
     	push!(threadbuffs, ThreadBuffer(femm, assembler));
     end
 
-    Ux = FFlt[]; ts = FFlt[]
+    Ux = Float64[]; ts = Float64[]
     function increment_observer(step, t, un1)
         if step == 1 || rem(step, 10) == 0
             println("$(step) steps")
@@ -224,8 +228,8 @@ function neohookean_h8_thr(NTHREADS)
     dtn = 0.8 * stabldt
     tn = 0.0
     # Initial displacement, velocity, and acceleration.
-    Un = gathersysvec(un1);
-    Vn = gathersysvec(un1);
+    Un = gathersysvec(un1, DOF_KIND_ALL);
+    Vn = gathersysvec(un1, DOF_KIND_ALL);
     # The acceleration will be computed from the initial loads.
     An = deepcopy(Vn);
     Fn = deepcopy(Vn);
@@ -244,7 +248,7 @@ function neohookean_h8_thr(NTHREADS)
         end
         # Update the displacements
         @. Un1 = Un + dtn*Vn + ((dtn^2)/2)*An;# displacement update
-        scattersysvec!(un1, Un1);
+        scattersysvec!(un1, Un1, DOF_KIND_ALL);
         # Add the restoring forces, starting from the time-independent load.
         tasks = [];
         for th in 1:length(threadbuffs)
@@ -256,7 +260,7 @@ function neohookean_h8_thr(NTHREADS)
         end
         for th in 1:length(tasks)
         	Threads.wait(tasks[th]);
-        	Fn .+= threadbuffs[th].assembler.F_buffer
+            Fn .+= threadbuffs[th].assembler.F_buffer
         end
         # Compute the new acceleration.
         An1 .= invMv .* Fn;
@@ -293,6 +297,7 @@ function neohookean_h8_thr(NTHREADS)
 end # function neohookean_h8_thr
 
 function neohookean_h8_thr_2(NTHREADS)
+    @info "neohookean_h8_thr_2"
 	timing = time()
 
     m = MatDeforNeohookean(mr, mass_density, E, nu)
@@ -310,18 +315,19 @@ function neohookean_h8_thr_2(NTHREADS)
 
     bfes = meshboundary(fes)
     el1 = selectelem(fens, bfes, box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
-    function setvector!(v, XYZ::FFltMat, tangents::FFltMat, fe_label::FInt; time::FFlt = 0.0)
+    function setvector!(v, XYZ, tangents, fe_label)
         v .= 1.0 .* traction_vector
         return v
     end
-    fi = ForceIntensity(FFlt, length(traction_vector), setvector!, 0.0);
+    fi = ForceIntensity(Float64, length(traction_vector), setvector!, 0.0);
     eL1femm =  FEMMBase(IntegDomain(subset(bfes, el1), GaussRule(2, 2)))
     FL = distribloads(eL1femm, geom, u, fi, 2);
 
     movel1  = selectnode(fens; box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
 
     # Now we prepare  the assembly for threaded execution.
-    @show nth = NTHREADS #Base.Threads.nthreads()
+    nth = NTHREADS #Base.Threads.nthreads()
+    @info "$nth threads"
     chunk = Int(floor(count(fes) / nth))
     threadbuffs = ThreadBuffer[];
     for th in 1:nth
@@ -332,11 +338,11 @@ function neohookean_h8_thr_2(NTHREADS)
     	femm = FEMMDeforNonlinearExpl(mr, IntegDomain(feschnk, GaussRule(3, 2)), material)
     	femm = associategeometry!(femm, geom)
     	# It will use its own assembler in order to avoid memory contention.
-    	assembler = SysvecAssemblerOpt(fill(0.0, u.nfreedofs), u.nfreedofs)
+    	assembler = SysvecAssemblerOpt(fill(0.0, nfreedofs(u)), nfreedofs(u))
     	push!(threadbuffs, ThreadBuffer(femm, assembler));
     end
 
-    Ux = FFlt[]; ts = FFlt[]
+    Ux = Float64[]; ts = Float64[]
     function increment_observer(step, t, un1)
     	if step == 1 || rem(step, 3) == 0
     		println("$(step) steps")

@@ -1,7 +1,7 @@
 
 module m3test1a
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using LinearAlgebra: norm
 using Test
@@ -96,7 +96,7 @@ testelasticitytensor1.test()
 
 module m3test2a
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforLinear: stressttov!
 using FinEtoolsDeforNonlinear
 using LinearAlgebra

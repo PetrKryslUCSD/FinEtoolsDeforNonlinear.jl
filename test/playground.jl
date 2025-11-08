@@ -18,7 +18,7 @@ mcmatopt1.test()
 
 module mneotest1
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNonlinearModule: estimatesoundspeed
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean

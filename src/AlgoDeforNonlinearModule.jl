@@ -14,9 +14,9 @@ my_A_mul_B!(C, A, B) = mul!(C, A, B)
 import FinEtools.FieldModule: AbstractField, ndofs, setebc!, numberdofs!, applyebc!, scattersysvec!, wipe!, copyto!, incrscattersysvec!
 import FinEtools.NodalFieldModule: NodalField, nnodes
 import FinEtools.FEMMBaseModule: associategeometry!, distribloads, fieldfromintegpoints, elemfieldfromintegpoints
-import ..FEMMDeforNonlinearBaseModule: stiffness, geostiffness, nzebcloads, restoringforce
-import FinEtoolsDeforLinear.DeforModelRedModule: stresscomponentmap
-import FinEtools.ForceIntensityModule: ForceIntensity, settime!
+import ..FEMMDeforNonlinearBaseModule: stiffness, geostiffness, restoringforce
+import FinEtools.DeforModelRedModule: stresscomponentmap
+import FinEtools.ForceIntensityModule: ForceIntensity
 import FinEtools.MeshModificationModule: meshboundary
 import FinEtools.MeshExportModule.VTK: vtkexportmesh
 import LinearAlgebra: eigen, qr, dot, cholesky, sum
@@ -212,7 +212,7 @@ function nonlinearstatics(modeldata::FDataDict)
         applyebc!(du);
 
         # Initialize the load vector
-        F = fill(0.0, un1.nfreedofs);
+        F = fill(0.0, nfreedofs(un1));
         FL = similar(F);
 
         # If any boundary conditions are inhomogeneous, calculate  the force
@@ -227,7 +227,7 @@ function nonlinearstatics(modeldata::FDataDict)
             # Provided we got converged results  in the last step, we already
             # have a usable stiffness matrix.
             if K == nothing # we don't have a stiffness matrix
-                K = spzeros(un1.nfreedofs, un1.nfreedofs);
+                K = spzeros(nfreedofs(un1), nfreedofs(un1));
                 for i = 1:length(regions)
                     femm = deepcopy(regions[i]["femm"])
                     K = K + stiffness(femm, geom, un, unm1, lambda, dlambda);
@@ -246,7 +246,7 @@ function nonlinearstatics(modeldata::FDataDict)
             fill!(F, 0.0)
 
             # Construct the system stiffness matrix.
-            K =  spzeros(un1.nfreedofs,un1.nfreedofs);
+            K =  spzeros(nfreedofs(un1),nfreedofs(un1));
             for i = 1:length(regions)
                 femm = regions[i]["femm"];
                 K = K + stiffness(femm, geom, un1, un, lambda, dlambda);
@@ -274,7 +274,6 @@ function nonlinearstatics(modeldata::FDataDict)
                     dcheck!(tractionbc, traction_bcs_recognized_keys)
                     femm = tractionbc["femm"]
                     fi = tractionbc["traction_vector"];
-                    settime!(fi, lambda)
                     F .= F .+ distribloads(femm, geom, un1, fi, 2);
                 end
             end
@@ -296,7 +295,7 @@ function nonlinearstatics(modeldata::FDataDict)
             copyto!(FL, F);
 
             # The restoring  force vector
-            FR = fill(0.0, un1.nfreedofs);
+            FR = fill(0.0, nfreedofs(un1));
             for i = 1:length(regions)
                 femm = regions[i]["femm"];
                 FR .+= restoringforce(femm, geom, un1, un, lambda, dlambda);

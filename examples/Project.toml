@@ -1,0 +1,6 @@
+[deps]
+FinEtools = "91bb5406-6c9a-523d-811d-0644c4229550"
+FinEtoolsDeforLinear = "e9187c00-8bdd-11e9-1e70-7ba8303116a2"
+FinEtoolsDeforNonlinear = "c9fbf690-8ea2-11e9-1d56-e5e266ebe695"
+Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"

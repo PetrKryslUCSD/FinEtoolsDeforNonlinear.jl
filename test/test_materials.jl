@@ -1,7 +1,7 @@
 
 module m1test1
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using LinearAlgebra: norm
 using Test
@@ -51,7 +51,7 @@ m1test1.test()
 
 module m2test1
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using LinearAlgebra: norm
 using Test
@@ -102,7 +102,7 @@ m2test1.test()
 
 module m1test2
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using LinearAlgebra: norm
 using Test
@@ -152,7 +152,7 @@ m1test2.test()
 
 module m2test2
 using FinEtools
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed3D
+using FinEtools.DeforModelRedModule: DeforModelRed3D
 using FinEtoolsDeforNonlinear
 using LinearAlgebra: norm
 using Test

@@ -10,13 +10,13 @@ using FinEtools.FTypesModule: FInt, FFlt, FCplxFlt, FFltVec, FIntVec, FFltMat, F
 import FinEtools.FENodeSetModule: FENodeSet
 import FinEtools.FESetModule: AbstractFESet, gradN!, nodesperelem, manifdim
 import FinEtools.IntegDomainModule: IntegDomain, integrationdata, Jacobianvolume
-import FinEtools.FieldModule: ndofs, gatherdofnums!, gatherfixedvalues_asvec!, gathervalues_asvec!, gathervalues_asmat!
+import FinEtools.FieldModule: ndofs, gatherdofnums!, gathervalues_asvec!, gathervalues_asmat!
 import FinEtools.NodalFieldModule: NodalField, nnodes
 import FinEtools.AssemblyModule: AbstractSysvecAssembler, AbstractSysmatAssembler, SysmatAssemblerSparseSymm, startassembly!, assemble!, makematrix!, makevector!, SysvecAssembler
 import FinEtools.CSysModule: CSys, updatecsmat!
 import FinEtools.MatrixUtilityModule: add_btdb_ut_only!, complete_lt!, locjac!, add_nnt_ut_only!, add_gkgt_ut_only!, add_btsigma!
 import FinEtools.MatModule: massdensity
-import FinEtoolsDeforLinear.DeforModelRedModule: nstressstrain, nthermstrain, Blmat!, divmat, vgradmat
+import FinEtools.DeforModelRedModule: nstressstrain, nthermstrain, blmat!, divmat, vgradmat
 import FinEtoolsDeforLinear.MatDeforModule: rotstressvec!, stressvtot!
 import FinEtoolsDeforLinear.FEMMDeforLinearBaseModule: AbstractFEMMDeforLinear
 import ..MatDeforNonlinearModule: AbstractMatDeforNonlinear, tangentmoduli!, update!, estimatesoundspeed
@@ -155,14 +155,16 @@ Compute and assemble  stiffness matrix.
 - `tn` = time in step `n`
 - `dtn` = increment of time
 """
-function stiffness(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt) where {A<:AbstractSysmatAssembler, T<:Number}
+function stiffness(self::AbstractFEMMDeforNonlinear, assembler::A, 
+    geom::NodalField{GT}, un1::NodalField{T}, un::NodalField{T}, 
+    tn::PT, dtn::PT) where {A<:AbstractSysmatAssembler, GT<:Number, T<:Number, PT<:Number}
     fes = self.integdomain.fes
     npts,  Ns,  gradNparams,  w,  pc = integrationdata(self.integdomain);
     dofnums, loc, J, csmatTJ, gradXN, gradxN, gradxmN = _buff1(self, geom, un1)
     D, B, DB, elmat = _buff2(self, geom, un1)
     X, xn, xn1, Un, Un1, Fn, Fn1, Fnm, Fn1m, RmTF = _buff3(self, geom, un1)
     statev = deepcopy(self.statev) # work with copies of material state
-    startassembly!(assembler, size(elmat, 1), size(elmat, 2), count(fes), un1.nfreedofs, un1.nfreedofs);
+    startassembly!(assembler, size(elmat, 1), size(elmat, 2), count(fes), nalldofs(un1), nalldofs(un1));
     for i = 1:count(fes) # Loop over elements
         gathervalues_asmat!(geom, X, fes.conn[i]);
         gathervalues_asmat!(un, Un, fes.conn[i]);
@@ -192,7 +194,9 @@ function stiffness(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalFi
     return makematrix!(assembler);
 end
 
-function stiffness(self::AbstractFEMMDeforNonlinear, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt) where {T<:Number}
+function stiffness(self::AbstractFEMMDeforNonlinear, 
+    geom::NodalField{GT}, un1::NodalField{T}, un::NodalField{T}, 
+    tn::PT, dtn::PT) where {GT<:Number, T<:Number, PT<:Number}
     assembler = SysmatAssemblerSparseSymm();
     return stiffness(self, assembler, geom, un1, un, tn, dtn);
 end
@@ -212,7 +216,9 @@ Compute and assemble load vector due to prescribed increment of displacements.
 - `tn` = time in step `n`
 - `dtn` = increment of time
 """
-function nzebcloads(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, du::NodalField{T}, tn::FFlt, dtn::FFlt) where {A<:SysvecAssembler, T<:Number}
+function nzebcloads(self::AbstractFEMMDeforNonlinear, assembler::A, 
+    geom::NodalField{GT}, un1::NodalField{T}, un::NodalField{T}, du::NodalField{T}, 
+    tn::PT, dtn::PT) where {A<:SysvecAssembler, GT<:Number, T<:Number, PT<:Number}
     fes = self.integdomain.fes
     npts,  Ns,  gradNparams,  w,  pc = integrationdata(self.integdomain);
     dofnums, loc, J, csmatTJ, gradXN, gradxN, gradxmN = _buff1(self, geom, un1)
@@ -220,7 +226,7 @@ function nzebcloads(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalF
     X, xn, xn1, Un, Un1, Fn, Fn1, Fnm, Fn1m, RmTF = _buff3(self, geom, un1)
     B, elvec, pu = _buff4(self, geom, un1)
     statev = deepcopy(self.statev) # work with copies of material state
-    startassembly!(assembler, un1.nfreedofs);
+    startassembly!(assembler, nalldofs(un1));
     for i = 1:count(fes) # Loop over elements
         gatherfixedvalues_asvec!(du, pu, fes.conn[i]);
         if norm(pu) != 0.0
@@ -242,7 +248,7 @@ function nzebcloads(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalF
                 rotF!(Fn1m, Fn1, RmTF, Rm) # wrt local c.s.
                 tangentmoduli!(self.material, D, statev[i][j], Fn1m, Fnm, tn, dtn, loc, fes.label[i])
                 A_mul_B!(gradxmN, (gradXN / Fn1), Rm)
-                Blmat!(self.mr, B, Ns[j], gradxmN, loc, Rm); # local strain-global disp
+                blmat!(self.mr, B, Ns[j], gradxmN, loc, Rm); # local strain-global disp
                 add_btdb_ut_only!(elmat, B, Jac*w[j]*det(Fn1), D, DB)
             end # Loop over quadrature points
             complete_lt!(elmat)
@@ -254,7 +260,9 @@ function nzebcloads(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalF
     return makevector!(assembler);
 end
 
-function nzebcloads(self::AbstractFEMMDeforNonlinear, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, du::NodalField{T}, tn::FFlt, dtn::FFlt) where {T<:Number}
+function nzebcloads(self::AbstractFEMMDeforNonlinear, 
+    geom::NodalField{GT}, un1::NodalField{T}, un::NodalField{T}, du::NodalField{T}, 
+    tn::PT, dtn::PT) where {GT<:Number, T<:Number, PT<:Number}
     assembler = SysvecAssembler();
     return nzebcloads(self, assembler, geom, un1, un, du, tn, dtn);
 end
@@ -276,7 +284,9 @@ particular, the material state gets updated.
 - `dtn` = increment of time
 - `savestate` = bool flag: should we modify the material states (`savestate = true`)? Otherwise work with a copy of the material state.
 """
-function restoringforce(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt, savestate = false) where {A<:AbstractSysvecAssembler, T<:Number}
+function restoringforce(self::AbstractFEMMDeforNonlinear, assembler::A, 
+    geom::NodalField{GT}, un1::NodalField{T}, un::NodalField{T}, 
+    tn::PT, dtn::PT, savestate = false) where {A<:AbstractSysvecAssembler, GT<:Number, T<:Number, PT<:Number}
     fes = self.integdomain.fes
     npts,  Ns,  gradNparams,  w,  pc = integrationdata(self.integdomain);
     dofnums, loc, J, csmatTJ, gradXN, gradxN, gradxmN = _buff1(self, geom, un1)
@@ -287,7 +297,7 @@ function restoringforce(self::AbstractFEMMDeforNonlinear, assembler::A, geom::No
     if !savestate  # unless we are instructed to work with a copy
         statev = deepcopy(self.statev) # work with copies of material state
     end
-    startassembly!(assembler, un1.nfreedofs);
+    startassembly!(assembler, nalldofs(un1));
     for i = 1:count(fes) # Loop over elements
         gathervalues_asmat!(geom, X, fes.conn[i]);
         gathervalues_asmat!(un, Un, fes.conn[i]);
@@ -308,7 +318,7 @@ function restoringforce(self::AbstractFEMMDeforNonlinear, assembler::A, geom::No
             update!(self.material, statev[i][j], cauchy, output, Fn1m, Fnm, tn, dtn, loc, fes.label[i])
             gradN!(fes, gradxN, gradXN, Fn1); # wrt current c.s.
             A_mul_B!(gradxmN, gradxN, Rm) # wrt material c.s.
-            Blmat!(self.mr, B, Ns[j], gradxmN, loc, Rm); # local strain-global disp
+            blmat!(self.mr, B, Ns[j], gradxmN, loc, Rm); # local strain-global disp
             add_btsigma!(elvec, B, - Jac * w[j] * det(Fn1), cauchy)
         end # Loop over quadrature points
         gatherdofnums!(un1, dofnums, fes.conn[i]); # retrieve degrees of freedom
@@ -317,7 +327,9 @@ function restoringforce(self::AbstractFEMMDeforNonlinear, assembler::A, geom::No
     return makevector!(assembler);
 end
 
-function restoringforce(self::AbstractFEMMDeforNonlinear, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt, savestate = false) where {T<:Number}
+function restoringforce(self::AbstractFEMMDeforNonlinear, 
+    geom::NodalField{GT}, un1::NodalField{T}, un::NodalField{T}, 
+    tn::PT, dtn::PT, savestate = false) where {GT<:Number, T<:Number, PT<:Number}
     assembler = SysvecAssembler();
     return restoringforce(self, assembler, geom, un1, un, tn, dtn, savestate);
 end
@@ -335,7 +347,9 @@ Compute and assemble geometric stiffness matrix.
 - `tn` = time in step `n`
 - `dtn` = increment of time
 """
-function geostiffness(self::AbstractFEMMDeforNonlinear, assembler::A, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt) where {A<:AbstractSysmatAssembler, T<:Number}
+function geostiffness(self::AbstractFEMMDeforNonlinear, assembler::A, 
+    geom::NodalField{GT}, un1::NodalField{T}, un::NodalField{T}, 
+    tn::PT, dtn::PT) where {A<:AbstractSysmatAssembler, GT<:Number, T<:Number, PT<:Number}
     fes = self.integdomain.fes
     npts,  Ns,  gradNparams,  w,  pc = integrationdata(self.integdomain);
     dofnums, loc, J, csmatTJ, gradXN, gradxN, gradxmN = _buff1(self, geom, un1)
@@ -343,7 +357,7 @@ function geostiffness(self::AbstractFEMMDeforNonlinear, assembler::A, geom::Noda
     cauchy, output, sigma = _buff5(self, geom, un1)
     idx, elmat, c1, sg = _buff6(self, geom, un1)
     statev = deepcopy(self.statev) # work with copies of material state
-    startassembly!(assembler, size(elmat, 1), size(elmat, 2), count(fes), un1.nfreedofs, un1.nfreedofs);
+    startassembly!(assembler, size(elmat, 1), size(elmat, 2), count(fes), nalldofs(un1), nalldofs(un1));
     for i = 1:count(fes) # Loop over elements
         gathervalues_asmat!(geom, X, fes.conn[i]);
         gathervalues_asmat!(un, Un, fes.conn[i]);
@@ -378,17 +392,19 @@ function geostiffness(self::AbstractFEMMDeforNonlinear, assembler::A, geom::Noda
     return makematrix!(assembler);
 end
 
-function geostiffness(self::AbstractFEMMDeforNonlinear, geom::NodalField{FFlt}, un1::NodalField{T}, un::NodalField{T}, tn::FFlt, dtn::FFlt) where {T<:Number}
+function geostiffness(self::AbstractFEMMDeforNonlinear, 
+    geom::NodalField{GT}, un1::NodalField{T}, un::NodalField{T}, 
+    tn::PT, dtn::PT) where {GT<:Number, T<:Number, PT<:Number}
     assembler = SysmatAssemblerSparseSymm();
     return geostiffness(self, assembler, geom, un1, un, tn, dtn);
 end
 
-function estimatestablestep(self::AbstractFEMMDeforNonlinear, geom::NodalField{FFlt}) 
+function estimatestablestep(self::AbstractFEMMDeforNonlinear, geom::NodalField{GT})  where {GT<:Number}
     fes = self.integdomain.fes
     npts,  Ns,  gradNparams,  w,  pc = integrationdata(self.integdomain);
     nne = nodesperelem(fes); # number of nodes for element
     sdim = ndofs(geom);            # number of space dimensions
-    X = fill(zero(FFlt), nne, sdim)
+    X = fill(zero(GT), nne, sdim)
     # The formula below is strictly speaking only applicable in three
     # dimensions for isotropic materials.  This needs to be generalized at
     # some point.

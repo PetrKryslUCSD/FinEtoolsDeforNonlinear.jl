@@ -3,7 +3,7 @@ module bertoldi_compression_examples
 using FinEtools
 using FinEtools.MeshImportModule
 using FinEtools.MeshImportModule: import_ABAQUS 
-using FinEtoolsDeforLinear.DeforModelRedModule: DeforModelRed2DStrain
+using FinEtools.DeforModelRedModule: DeforModelRed2DStrain
 using FinEtoolsDeforNonlinear
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanModule: MatDeforNeohookean
 using FinEtoolsDeforNonlinear.MatDeforNeohookeanADModule: MatDeforNeohookeanAD
