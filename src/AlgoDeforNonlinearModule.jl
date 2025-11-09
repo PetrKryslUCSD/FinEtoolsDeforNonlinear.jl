@@ -11,7 +11,7 @@ import Arpack: eigs
 import SparseArrays: spzeros
 import LinearAlgebra: mul!
 my_A_mul_B!(C, A, B) = mul!(C, A, B)
-import FinEtools.FieldModule: AbstractField, ndofs, setebc!, numberdofs!, applyebc!, scattersysvec!, wipe!, copyto!, incrscattersysvec!
+import FinEtools.FieldModule: AbstractField, ndofs, nfreedofs, setebc!, numberdofs!, applyebc!, scattersysvec!, wipe!, copyto!, incrscattersysvec!
 import FinEtools.NodalFieldModule: NodalField, nnodes
 import FinEtools.FEMMBaseModule: associategeometry!, distribloads, fieldfromintegpoints, elemfieldfromintegpoints
 import ..FEMMDeforNonlinearBaseModule: stiffness, geostiffness, restoringforce
@@ -185,7 +185,7 @@ function nonlinearstatics(modeldata::FDataDict)
         copyto!(un1, un)
 
         # Process load-factor-dependent essential boundary conditions:
-        aany_nonzero_EBC = false;
+        any_nonzero_EBC = false;
         essential_bcs = get(modeldata, "essential_bcs", nothing);
         if (essential_bcs != nothing)
             for j = 1:length(essential_bcs)
@@ -197,7 +197,7 @@ function nonlinearstatics(modeldata::FDataDict)
                     for k in 1:length(fenids)
                         u_fixed = displacement(geom.values[fenids[k],:], lambda);
                         setebc!(un1, [fenids[k]], true, component, u_fixed[1]);
-                        aany_nonzero_EBC = aany_nonzero_EBC || (u_fixed[1] != 0.0);
+                        any_nonzero_EBC = any_nonzero_EBC || (u_fixed[1] != 0.0);
                     end
                     applyebc!(un1);
                     numberdofs!(un1)
@@ -218,7 +218,7 @@ function nonlinearstatics(modeldata::FDataDict)
         # If any boundary conditions are inhomogeneous, calculate  the force
         # vector due to the displacement increment. Then update the guess of
         # the new displacement.
-        if (aany_nonzero_EBC)
+        if (any_nonzero_EBC)
             du.fixed_values .= un1.fixed_values .- un.fixed_values
             for i = 1:length(regions)
                 femm = deepcopy(regions[i]["femm"])
@@ -226,7 +226,7 @@ function nonlinearstatics(modeldata::FDataDict)
             end
             # Provided we got converged results  in the last step, we already
             # have a usable stiffness matrix.
-            if K == nothing # we don't have a stiffness matrix
+            if K === nothing # we don't have a stiffness matrix
                 K = spzeros(nfreedofs(un1), nfreedofs(un1));
                 for i = 1:length(regions)
                     femm = deepcopy(regions[i]["femm"])

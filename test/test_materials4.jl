@@ -58,7 +58,7 @@ function test()
 	modeldata["iteration_observer"] = (lambda, iter, du, modeldata) -> begin
 		# @show lambda, iter, modeldata["maxdu"], modeldata["maxbal"]
 	end
-	Ux = FFlt[]; Rx = FFlt[]
+	Ux = Float64[]; Rx = Float64[]
 	modeldata["increment_observer"] = (lambda, modeldata) -> begin
 		push!(Ux, mean(modeldata["un1"].values[movel1,1]));
 		push!(Rx, sum(modeldata["reactions"].values[movel1,1]));
@@ -137,7 +137,7 @@ function test()
 	modeldata["iteration_observer"] = (lambda, iter, du, modeldata) -> begin
 	    # @show lambda, iter, modeldata["maxdu"], modeldata["maxbal"]
 	end
-	Ux = FFlt[]; Rx = FFlt[]
+	Ux = Float64[]; Rx = Float64[]
 	modeldata["increment_observer"] = (lambda, modeldata) -> begin
 	    push!(Ux, mean(modeldata["un1"].values[movel1,1]));
 	    push!(Rx, sum(modeldata["reactions"].values[movel1,1]));
@@ -216,7 +216,7 @@ function test()
 	modeldata["iteration_observer"] = (lambda, iter, du, modeldata) -> begin
 	    # @show lambda, iter, modeldata["maxdu"], modeldata["maxbal"]
 	end
-	Ux = FFlt[]; Rx = FFlt[]
+	Ux = Float64[]; Rx = Float64[]
 	modeldata["increment_observer"] = (lambda, modeldata) -> begin
 	    push!(Ux, mean(modeldata["un1"].values[movel1,1]));
 	    push!(Rx, sum(modeldata["reactions"].values[movel1,1]));
@@ -295,7 +295,7 @@ function test()
 	modeldata["iteration_observer"] = (lambda, iter, du, modeldata) -> begin
 	    # @show lambda, iter, modeldata["maxdu"], modeldata["maxbal"]
 	end
-	Ux = FFlt[]; Rx = FFlt[]
+	Ux = Float64[]; Rx = Float64[]
 	modeldata["increment_observer"] = (lambda, modeldata) -> begin
 	    push!(Ux, mean(modeldata["un1"].values[movel1,1]));
 	    push!(Rx, sum(modeldata["reactions"].values[movel1,1]));
@@ -380,7 +380,7 @@ function test()
     modeldata["iteration_observer"] = (lambda, iter, du, modeldata) -> begin
         # @show lambda, iter, modeldata["maxdu"], modeldata["maxbal"]
     end
-    Ux = FFlt[]; Rx = FFlt[]
+    Ux = Float64[]; Rx = Float64[]
     modeldata["increment_observer"] = (lambda, modeldata) -> begin
         push!(Ux, mean(modeldata["un1"].values[movel1,1]));
         push!(Rx, sum(modeldata["reactions"].values[movel1,1]));
@@ -416,8 +416,8 @@ function test()
 
     stress = fill(0.0, 6)
     D = fill(0.0, 6, 6)
-    output = FFlt[]
-    statev = FFlt[]
+    output = Float64[]
+    statev = Float64[]
     tn = 0.0
     dtn = 0.0
     loc = [0.0 0.0 0.0]

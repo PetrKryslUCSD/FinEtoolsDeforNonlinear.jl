@@ -7,7 +7,7 @@ include("cantilever_dyn_examples.jl");
 # cantilever_dyn_examples.neohookean_h8()   
 # Parallel execution
 for NTHREADS in [1 2 4 8]
-	cantilever_dyn_examples.neohookean_h8_thr(NTHREADS)   
+	cantilever_dyn_examples.neohookean_h8_thr_2(NTHREADS)   
 end
 
 

@@ -13,8 +13,8 @@ function test()
     update! = FinEtoolsDeforNonlinear.MatDeforNonlinearModule.update!
 
     stress = fill(0.0, 6)
-    output = FFlt[]
-    statev = FFlt[]
+    output = Float64[]
+    statev = Float64[]
     tn = 0.0
     dtn = 0.0
     loc = [0.0 0.0 0.0]
@@ -64,8 +64,8 @@ function test()
     update! = FinEtoolsDeforNonlinear.MatDeforNonlinearModule.update!
 
     stress = fill(0.0, 6)
-    output = FFlt[]
-    statev = FFlt[]
+    output = Float64[]
+    statev = Float64[]
     tn = 0.0
     dtn = 0.0
     loc = [0.0 0.0 0.0]
@@ -114,8 +114,8 @@ function test()
     update! = FinEtoolsDeforNonlinear.MatDeforNonlinearModule.update!
 
     stress = fill(0.0, 6)
-    output = FFlt[]
-    statev = FFlt[]
+    output = Float64[]
+    statev = Float64[]
     tn = 0.0
     dtn = 0.0
     loc = [0.0 0.0 0.0]
@@ -165,8 +165,8 @@ function test()
     update! = FinEtoolsDeforNonlinear.MatDeforNonlinearModule.update!
 
     stress = fill(0.0, 6)
-    output = FFlt[]
-    statev = FFlt[]
+    output = Float64[]
+    statev = Float64[]
     tn = 0.0
     dtn = 0.0
     loc = [0.0 0.0 0.0]

@@ -10,7 +10,7 @@ using FinEtoolsDeforNonlinear.FEMMDeforNonlinearBaseModule: stiffness, geostiffn
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearModule: FEMMDeforNonlinear
 using FinEtoolsDeforNonlinear.FEMMDeforNonlinearExplModule: FEMMDeforNonlinearExpl
 using FinEtoolsDeforNonlinear.AssemblyModule: SysvecAssemblerOpt
-using LinearAlgebra: norm
+using LinearAlgebra: norm, BLAS
 using Statistics: mean
 using SparseArrays
 using DelimitedFiles
@@ -27,12 +27,14 @@ tmag = 0.1*phun("MPa");# Magnitude of the traction
 tolerance = W / 1000
 traction_vector = [0.0, 0.0, -tmag]
 # A million-element mesh
-# nL, nW, nH = 160, 80, 80
+nL, nW, nH = 160, 80, 80
 # tend = 0.00075e-3
 # Much smaller mesh
-nL, nW, nH = 80, 40, 40
-# nL, nW, nH = 40, 20, 20
+# nL, nW, nH = 80, 40, 40
+# nL, nW, nH = 20, 10, 10
 tend = 0.01e-3
+
+BLAS.set_num_threads(1) # Disable BLAS threading
 
 function neohookean_h8()
     @info "neohookean_h8"
@@ -315,11 +317,11 @@ function neohookean_h8_thr_2(NTHREADS)
 
     bfes = meshboundary(fes)
     el1 = selectelem(fens, bfes, box = [L,L,-Inf,Inf,-Inf,Inf], inflate  =  tolerance)
-    function setvector!(v, XYZ, tangents, fe_label)
+    function setvector!(v, XYZ, tangents, fe_id, qp_id)
         v .= 1.0 .* traction_vector
         return v
     end
-    fi = ForceIntensity(Float64, length(traction_vector), setvector!, 0.0);
+    fi = ForceIntensity(Float64, length(traction_vector), setvector!);
     eL1femm =  FEMMBase(IntegDomain(subset(bfes, el1), GaussRule(2, 2)))
     FL = distribloads(eL1femm, geom, u, fi, 2);
 
@@ -338,7 +340,7 @@ function neohookean_h8_thr_2(NTHREADS)
     	femm = FEMMDeforNonlinearExpl(mr, IntegDomain(feschnk, GaussRule(3, 2)), material)
     	femm = associategeometry!(femm, geom)
     	# It will use its own assembler in order to avoid memory contention.
-    	assembler = SysvecAssemblerOpt(fill(0.0, nfreedofs(u)), nfreedofs(u))
+    	assembler = SysvecAssemblerOpt(fill(0.0, nalldofs(u)), nalldofs(u))
     	push!(threadbuffs, ThreadBuffer(femm, assembler));
     end
 
@@ -366,8 +368,8 @@ function neohookean_h8_thr_2(NTHREADS)
     dtn = 0.8 * stabldt
     tn = 0.0
     # Initial displacement, velocity, and acceleration.
-    Un = gathersysvec(un1);
-    Vn = gathersysvec(un1);
+    Un = gathersysvec(un1, DOF_KIND_ALL);
+    Vn = gathersysvec(un1, DOF_KIND_ALL);
     # The acceleration will be computed from the initial loads.
     An = deepcopy(Vn);
     Fn = deepcopy(Vn);
@@ -389,7 +391,7 @@ function neohookean_h8_thr_2(NTHREADS)
         end
         # Update the displacements
         @. Un1 = Un + dtn*Vn + ((dtn^2)/2)*An;# displacement update
-        scattersysvec!(un1, Un1);
+        scattersysvec!(un1, Un1, DOF_KIND_ALL);
         # Add the restoring forces, starting from the time-independent load.
         tim = time()
         tim1  = time()
